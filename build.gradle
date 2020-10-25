@@ -1,0 +1,104 @@
+plugins {
+    id 'java'
+    id 'maven-publish'
+    id 'signing'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+    withJavadocJar()
+    withSourcesJar()
+}
+
+group 'io.github.vaa25'
+archivesBaseName = 'poiji2'
+version = System.getenv('RELEASE_VERSION') ?: "0.0.1"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.apache.poi:poi-ooxml:4.1.2'
+    testImplementation 'junit:junit:4.13.1'
+}
+
+test {
+    useJUnit()
+}
+
+jar {
+    from sourceSets.main.output
+    from sourceSets.main.allJava
+}
+
+signing {
+    sign publishing.publications
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            customizePom(pom)
+            groupId group
+            artifactId archivesBaseName
+            version version
+
+            from components.java
+        }
+    }
+    repositories {
+        maven {
+            url "https://oss.sonatype.org/service/local/staging/deploy/maven2"
+            credentials {
+                username sonatypeUsername
+                password 'sonatypePassword
+            }
+        }
+    }
+}
+
+def customizePom(pom) {
+    pom.withXml {
+        def root = asNode()
+
+        root.dependencies.removeAll { dep ->
+            dep.scope == "test"
+        }
+
+        root.children().last() + {
+            resolveStrategy = DELEGATE_FIRST
+
+            description 'Perfect annotation based library to read and write excel files'
+            name 'Poiji2'
+            url 'https://github.com/vaa25/poiji2'
+            organization {
+                name 'com.github.vaa25'
+                url 'https://github.com/vaa25'
+            }
+            issueManagement {
+                system 'GitHub'
+                url 'https://github.com/vaa25/poiji2/issues'
+            }
+            licenses {
+                license {
+                    name 'The Apache License, Version 2.0'
+                    url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                }
+            }
+            scm {
+                url 'https://github.com/vaa25/projectname'
+                connection 'scm:https://github.com/vaa25/poigi2.git'
+                developerConnection 'scm:git://github.com/vaa25/poigi2.git'
+            }
+            developers {
+                developer {
+                    id 'dev'
+                    name 'Alexander Vlasov'
+                    email 'alex.vlasov.ua@gmail.com'
+                }
+            }
+        }
+    }
+}
