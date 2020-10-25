@@ -52,8 +52,8 @@ publishing {
         maven {
             url "https://oss.sonatype.org/service/local/staging/deploy/maven2"
             credentials {
-                username 'vaa25'
-                password 'uZaaJ.LNH4ay5PE'
+                username sonatypeUsername
+                password sonatypePassword
             }
         }
     }
