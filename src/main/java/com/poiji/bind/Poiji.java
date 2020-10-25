@@ -27,7 +27,7 @@ import static com.poiji.util.PoijiConstants.XLS_EXTENSION;
  * <p>
  * Example:
  * <pre>
- * List<Employee> employees = Poiji.fromExcel(new File("employees.xls"), Employee.class);
+ * {@literal List<Employee>} employees = Poiji.fromExcel(new File("employees.xls"), Employee.class);
  * employees.size();
  * // 3
  * Employee firstEmployee = employees.get(0);

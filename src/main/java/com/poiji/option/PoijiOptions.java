@@ -411,7 +411,7 @@ public final class PoijiOptions {
         }
 
         /**
-         * limit a number of rows after the header & skipped rows row. The header & skipped rows are not counted.
+         * limit a number of rows after the header &amp; skipped rows row. The header &amp; skipped rows are not counted.
          *
          * @param limit number
          * @return this
@@ -428,7 +428,7 @@ public final class PoijiOptions {
         /**
          * set password for encrypted excel file, Default is null
          *
-         * @param password
+         * @param password password for encrypted excel file
          * @return this
          */
         public PoijiOptionsBuilder password(String password) {
@@ -543,6 +543,7 @@ public final class PoijiOptions {
          * Default - false.
          *
          * @param caseInsensitive true or false
+         * @return this builder
          */
         public PoijiOptionsBuilder caseInsensitive(final boolean caseInsensitive) {
             this.caseInsensitive = caseInsensitive;
