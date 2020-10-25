@@ -89,8 +89,8 @@ def customizePom(pom) {
             }
             scm {
                 url 'https://github.com/vaa25/projectname'
-                connection 'scm:https://github.com/vaa25/poigi2.git'
-                developerConnection 'scm:git://github.com/vaa25/poigi2.git'
+                connection 'scm:https://github.com/vaa25/poiji2.git'
+                developerConnection 'scm:git://github.com/vaa25/poiji2.git'
             }
             developers {
                 developer {
