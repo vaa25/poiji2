@@ -10,13 +10,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import javax.xml.parsers.ParserConfigurationException;
-import org.apache.poi.ooxml.util.SAXHelper;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.poifs.filesystem.DocumentFactoryHelper;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.util.IOUtils;
+import org.apache.poi.util.XMLHelper;
 import org.apache.poi.xssf.eventusermodel.ReadOnlySharedStringsTable;
 import org.apache.poi.xssf.eventusermodel.XSSFReader;
 import org.apache.poi.xssf.eventusermodel.XSSFReader.SheetIterator;
@@ -44,7 +44,7 @@ abstract class XSSFUnmarshaller implements Unmarshaller {
         ReadOnlySharedStringsTable readOnlySharedStringsTable = new ReadOnlySharedStringsTable(open);
         XSSFReader workbookReader = new XSSFReader(open);
         StylesTable styles = workbookReader.getStylesTable();
-        XMLReader reader = SAXHelper.newXMLReader();
+        XMLReader reader = XMLHelper.newXMLReader();
 
         InputSource is = new InputSource(workbookReader.getWorkbookData());
 

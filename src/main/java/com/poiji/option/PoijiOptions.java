@@ -38,6 +38,7 @@ public final class PoijiOptions {
     private int headerStart;
     private String sheetName;
     private boolean caseInsensitive;
+    private boolean namedHeaderMandatory;
 
     private PoijiOptions() {
         super();
@@ -223,8 +224,17 @@ public final class PoijiOptions {
         return caseInsensitive;
     }
 
-    private PoijiOptions setCaseInsensitive(final boolean caseInsensitive) {
+    public PoijiOptions setCaseInsensitive(final boolean caseInsensitive) {
         this.caseInsensitive = caseInsensitive;
+        return this;
+    }
+
+    public boolean getNamedHeaderMandatory() {
+        return namedHeaderMandatory;
+    }
+
+    public PoijiOptions setNamedHeaderMandatory(boolean namedHeaderMandatory) {
+        this.namedHeaderMandatory = namedHeaderMandatory;
         return this;
     }
 
@@ -250,6 +260,7 @@ public final class PoijiOptions {
         private int limit = 0;
         private String sheetName;
         private boolean caseInsensitive;
+        private boolean namedHeaderMandatory;
 
         private PoijiOptionsBuilder() {
         }
@@ -303,7 +314,7 @@ public final class PoijiOptions {
          * set date pattern, default date format is "dd/M/yyyy" for
          * java.util.Date
          *
-         * @param datePattern date pattern
+         * @param datePattern date time formatter
          * @return this
          */
         public PoijiOptionsBuilder datePattern(String datePattern) {
@@ -368,7 +379,8 @@ public final class PoijiOptions {
                 .setCasting(casting)
                 .setToCellCasting(toCellCasting)
                 .setLimit(limit)
-                .setCaseInsensitive(caseInsensitive);
+                .setCaseInsensitive(caseInsensitive)
+                .setNamedHeaderMandatory(namedHeaderMandatory);
         }
 
         /**
@@ -411,7 +423,7 @@ public final class PoijiOptions {
         }
 
         /**
-         * limit a number of rows after the header &amp; skipped rows row. The header &amp; skipped rows are not counted.
+         * limit a number of rows after the header & skipped rows row. The header & skipped rows are not counted.
          *
          * @param limit number
          * @return this
@@ -428,7 +440,7 @@ public final class PoijiOptions {
         /**
          * set password for encrypted excel file, Default is null
          *
-         * @param password password for encrypted excel file
+         * @param password
          * @return this
          */
         public PoijiOptionsBuilder password(String password) {
@@ -547,6 +559,11 @@ public final class PoijiOptions {
          */
         public PoijiOptionsBuilder caseInsensitive(final boolean caseInsensitive) {
             this.caseInsensitive = caseInsensitive;
+            return this;
+        }
+
+        public PoijiOptionsBuilder namedHeaderMandatory(boolean namedHeaderMandatory) {
+            this.namedHeaderMandatory = namedHeaderMandatory;
             return this;
         }
     }

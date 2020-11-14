@@ -6,6 +6,7 @@ import com.poiji.annotation.ExcelCellRange;
 import com.poiji.annotation.ExcelRow;
 import com.poiji.annotation.ExcelUnknownCells;
 import com.poiji.annotation.ExcelWriteOnly;
+import com.poiji.bind.Poiji;
 import com.poiji.exception.IllegalCastException;
 import com.poiji.option.PoijiOptions;
 import com.poiji.util.ReflectUtil;
@@ -58,6 +59,7 @@ public class ReadMappedFields {
         final List<Field> withoutUnknownCells = parseUnknownCells(withoutExcelCell);
         final List<Field> withoutExcelCellName = parseExcelCellName(withoutUnknownCells);
         parseExcelRow(withoutExcelCellName);
+        Poiji.validateMandatoryNameColumns(options, entity, columnNames);
         return this;
     }
 
