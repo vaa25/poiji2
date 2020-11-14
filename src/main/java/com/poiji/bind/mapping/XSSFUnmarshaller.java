@@ -20,7 +20,6 @@ import org.apache.poi.util.XMLHelper;
 import org.apache.poi.xssf.eventusermodel.ReadOnlySharedStringsTable;
 import org.apache.poi.xssf.eventusermodel.XSSFReader;
 import org.apache.poi.xssf.eventusermodel.XSSFReader.SheetIterator;
-import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler;
 import org.apache.poi.xssf.model.StylesTable;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
@@ -56,7 +55,11 @@ abstract class XSSFUnmarshaller implements Unmarshaller {
         if (sheets.isEmpty()) {
             throw new PoijiException("no excel sheets found");
         }
-	    SheetIterator iter = (SheetIterator) workbookReader.getSheetsData();
+        PoijiNumberFormat poijiNumberFormat = options.getPoijiNumberFormat();
+        if (poijiNumberFormat != null)
+            poijiNumberFormat.overrideExcelNumberFormats(styles);
+
+        SheetIterator iter = (SheetIterator) workbookReader.getSheetsData();
 	    int sheetCounter = 0;
 
 	    Optional<String> maybeSheetName = SheetNameExtractor.getSheetName(type, options);
@@ -106,13 +109,14 @@ abstract class XSSFUnmarshaller implements Unmarshaller {
         try {
             final ReadMappedFields mappedFields = new ReadMappedFields(type, options).parseEntity();
             PoijiHandler<T> poijiHandler = new PoijiHandler<>(type, options, consumer, mappedFields);
-            ContentHandler contentHandler = new XSSFSheetXMLHandler(
+            ContentHandler contentHandler = new XSSFSheetXMLPoijiHandler(
                 styles,
                 null,
                 readOnlySharedStringsTable,
                 poijiHandler,
                 formatter,
-                false
+                false,
+                options
             );
             reader.setContentHandler(contentHandler);
             reader.parse(sheetSource);

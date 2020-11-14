@@ -1,6 +1,8 @@
 package com.poiji.option;
 
 import com.poiji.annotation.ExcelCellName;
+import com.poiji.bind.mapping.PoijiLogCellFormat;
+import com.poiji.bind.mapping.PoijiNumberFormat;
 import com.poiji.config.Casting;
 import com.poiji.config.DefaultCasting;
 import com.poiji.exception.PoijiException;
@@ -39,6 +41,36 @@ public final class PoijiOptions {
     private String sheetName;
     private boolean caseInsensitive;
     private boolean namedHeaderMandatory;
+    private PoijiLogCellFormat poijiLogCellFormat;
+    private PoijiNumberFormat numberFormat;
+    private boolean disableXLSXNumberCellFormat;
+
+    private PoijiOptions disableXLSXNumberCellFormat(boolean disableXLSXNumberCellFormat) {
+        this.disableXLSXNumberCellFormat = disableXLSXNumberCellFormat;
+        return this;
+    }
+
+    public boolean isDisableXLSXNumberCellFormat() {
+        return disableXLSXNumberCellFormat;
+    }
+
+    public PoijiNumberFormat getPoijiNumberFormat() {
+        return numberFormat;
+    }
+
+    private PoijiOptions setPoijiNumberFormat(PoijiNumberFormat numberFormat) {
+        this.numberFormat = numberFormat;
+        return this;
+    }
+
+    public PoijiLogCellFormat getPoijiCellFormat() {
+        return poijiLogCellFormat;
+    }
+
+    private PoijiOptions setPoijiLogCellFormat(PoijiLogCellFormat poijiLogCellFormat) {
+        this.poijiLogCellFormat = poijiLogCellFormat;
+        return this;
+    }
 
     private PoijiOptions() {
         super();
@@ -255,6 +287,9 @@ public final class PoijiOptions {
         private DateTimeFormatter dateTimeFormatter = DEFAULT_DATE_TIME_FORMATTER;
         private Casting casting = new DefaultCasting();
         private ToCellCasting toCellCasting = new ToCellCasting();
+        private PoijiLogCellFormat cellFormat;
+        private PoijiNumberFormat numberFormat;
+        private boolean disabledXLSXNumberCellFormat;
         private int headerStart = 0;
         private int skip = 0;
         private int limit = 0;
@@ -267,6 +302,16 @@ public final class PoijiOptions {
 
         private PoijiOptionsBuilder(int skip) {
             this.skip = skip;
+        }
+
+        /**
+         * Disable the cell format of all the number cells of an excel file ending with xlsx
+         *
+         * @return this
+         */
+        public PoijiOptionsBuilder disableXLSXNumberCellFormat() {
+            this.disabledXLSXNumberCellFormat = true;
+            return this;
         }
 
         /**
@@ -379,7 +424,10 @@ public final class PoijiOptions {
                 .setCasting(casting)
                 .setToCellCasting(toCellCasting)
                 .setLimit(limit)
+                .setPoijiLogCellFormat(cellFormat)
+                .setPoijiNumberFormat(numberFormat)
                 .setCaseInsensitive(caseInsensitive)
+                .disableXLSXNumberCellFormat(disabledXLSXNumberCellFormat)
                 .setNamedHeaderMandatory(namedHeaderMandatory);
         }
 
@@ -562,8 +610,34 @@ public final class PoijiOptions {
             return this;
         }
 
+        /**
+         * Set true if all headers named in {@link ExcelCellName} are mandatory, otherwise false
+         *
+         * @param namedHeaderMandatory fields are mandatory or not
+         */
         public PoijiOptionsBuilder namedHeaderMandatory(boolean namedHeaderMandatory) {
             this.namedHeaderMandatory = namedHeaderMandatory;
+            return this;
+        }
+
+        /**
+         * Add cell format option to see each internal cell's excel format for files ending with xlsx format.
+         * This option should be enabled for debugging purpose.
+         *
+         * @param cellFormat poiji cell format instance
+         */
+        public PoijiOptionsBuilder poijiLogCellFormat(final PoijiLogCellFormat cellFormat) {
+            this.cellFormat = cellFormat;
+            return this;
+        }
+
+        /**
+         * Change the default cell formats of an excel file by overriding
+         *
+         * @param numberFormat poiji number format instance
+         */
+        public PoijiOptionsBuilder poijiNumberFormat(final PoijiNumberFormat numberFormat) {
+            this.numberFormat = numberFormat;
             return this;
         }
     }

@@ -22,25 +22,25 @@ public class MandatoryNamedColumnsTest {
     @Parameterized.Parameters(name = "{index}: ({0})={1}")
     public static Iterable<Object[]> queries() {
         return Arrays.asList(new Object[][]{
-                {"src/test/resources/person.xlsx"},
-                {"src/test/resources/person.xls"}
+            {"src/test/resources/person.xlsx"},
+            {"src/test/resources/person.xls"}
         });
     }
 
     @Test
     public void testExcelSuccess() {
         Poiji.fromExcel(new File(path), PersonByNameWithMissingColumn.class, PoijiOptions.PoijiOptionsBuilder
-                .settings()
-                .namedHeaderMandatory(false)
-                .build());
+            .settings()
+            .namedHeaderMandatory(false)
+            .build());
     }
 
     @Test(expected = HeaderMissingException.class)
     public void testExcelFail() {
 
         Poiji.fromExcel(new File(path), PersonByNameWithMissingColumn.class, PoijiOptions.PoijiOptionsBuilder
-                .settings()
-                .namedHeaderMandatory(true)
-                .build());
+            .settings()
+            .namedHeaderMandatory(true)
+            .build());
     }
 }
