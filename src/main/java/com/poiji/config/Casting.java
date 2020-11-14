@@ -9,9 +9,6 @@ import com.poiji.option.PoijiOptions;
  */
 public interface Casting {
 
-    Object castValue(Class<?> fieldType, String value, PoijiOptions options);
+    Object castValue(Class<?> fieldType, String value, int row, int column, PoijiOptions options);
 
-    default Object castValue(Class<?> fieldType, String value, int row, int column, PoijiOptions options) {
-        return castValue(fieldType, value, options);
-    }
 }

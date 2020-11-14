@@ -53,6 +53,9 @@ abstract class XSSFUnmarshaller implements Unmarshaller {
 
         WorkBookContentHandler wbch = (WorkBookContentHandler) reader.getContentHandler();
 	    List<WorkBookSheet> sheets = wbch.getSheets();
+        if (sheets.isEmpty()) {
+            throw new PoijiException("no excel sheets found");
+        }
 	    SheetIterator iter = (SheetIterator) workbookReader.getSheetsData();
 	    int sheetCounter = 0;
 

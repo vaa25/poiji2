@@ -217,7 +217,7 @@ public class ReadMappedFields {
             }
         } else if (orderedFields.containsKey(column)) {
             final Field field = orderedFields.get(column);
-            final Object o = options.getCasting().castValue(field.getType(), content, options);
+            final Object o = options.getCasting().castValue(field.getType(), content, row, column, options);
             setFieldData(field, o, instance);
         } else {
             for (final Map.Entry<Field, ReadMappedFields> entry : rangeFields.entrySet()) {
