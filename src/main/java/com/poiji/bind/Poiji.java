@@ -1,5 +1,8 @@
 package com.poiji.bind;
 
+import com.poiji.bind.mapping.HSSFPropertyFile;
+import com.poiji.bind.mapping.HSSFPropertyStream;
+import com.poiji.bind.mapping.PoijiPropertyHelper;
 import com.poiji.bind.mapping.UnmarshallerHelper;
 import com.poiji.exception.IllegalCastException;
 import com.poiji.exception.InvalidExcelFileExtension;
@@ -41,6 +44,101 @@ public final class Poiji {
     private static final Files files = Files.getInstance();
 
     private Poiji() {
+    }
+
+    /**
+     * converts excel properties into an object
+     *
+     * @param file excel file ending with .xlsx.
+     * @param type type of the root object.
+     * @param <T>  type of the root object.
+     * @return the newly created objects
+     * @throws PoijiException            if an internal exception occurs during the mapping process.
+     * @throws InvalidExcelFileExtension if the specified excel file extension is invalid.
+     * @throws IllegalCastException      if this Field object is enforcing Java language access control and the underlying field is either inaccessible or final.
+     * @see Poiji#fromExcelProperties(File, Class, PoijiOptions)
+     */
+    public static <T> T fromExcelProperties(final File file, final Class<T> type) {
+        return fromExcelProperties(file, type, PoijiOptionsBuilder.settings().build());
+    }
+
+    /**
+     * converts excel properties into an object
+     *
+     * @param inputStream excel file stream
+     * @param excelType   type of the excel file, xlsx only!
+     * @param type        type of the root object.
+     * @param <T>         type of the root object.
+     * @return the newly created object
+     * @throws PoijiException            if an internal exception occurs during the mapping process.
+     * @throws InvalidExcelFileExtension if the specified excel file extension is invalid.
+     * @throws IllegalCastException      if this Field object is enforcing Java language access control and the underlying field is either inaccessible or final.
+     * @see Poiji#fromExcelProperties(InputStream, PoijiExcelType, Class, PoijiOptions)
+     */
+    public static <T> T fromExcelProperties(final InputStream inputStream,
+        PoijiExcelType excelType,
+        final Class<T> type) {
+        return fromExcelProperties(inputStream, excelType, type, PoijiOptionsBuilder.settings().build());
+    }
+
+    /**
+     * converts excel properties into an object
+     *
+     * @param file    excel file ending with .xlsx.
+     * @param type    type of the root object.
+     * @param <T>     type of the root object.
+     * @param options specifies to change the default behaviour of the poiji. In this case, only the password has an effect
+     * @return the newly created object
+     * @throws PoijiException            if an internal exception occurs during the mapping process.
+     * @throws InvalidExcelFileExtension if the specified excel file extension is invalid.
+     * @throws IllegalCastException      if this Field object is enforcing Java language access control and the underlying field is either inaccessible or final.
+     * @see Poiji#fromExcelProperties(File, Class)
+     */
+    public static <T> T fromExcelProperties(final File file, final Class<T> type, final PoijiOptions options) {
+        HSSFPropertyFile hssfPropertyFile = deserializerPropertyFile(file, options);
+        return hssfPropertyFile.unmarshal(type);
+    }
+
+    private static HSSFPropertyFile deserializerPropertyFile(final File file, PoijiOptions options) {
+        String extension = files.getExtension(file.getName());
+        if (XLSX_EXTENSION.equals(extension)) {
+            return PoijiPropertyHelper.createPoijiPropertyFile(file, options);
+        } else if (XLS_EXTENSION.equals(extension)) {
+            throw new InvalidExcelFileExtension("Reading metadata from (" + extension + "), is not supported");
+        } else {
+            throw new InvalidExcelFileExtension("Invalid file extension (" + extension + "), expected .xlsx");
+        }
+    }
+
+    private static HSSFPropertyStream deserializerPropertyStream(PoijiExcelType excelType, InputStream inputStream, PoijiOptions options) {
+        if (excelType == PoijiExcelType.XLSX) {
+            return PoijiPropertyHelper.createPoijiPropertyStream(inputStream, options);
+        } else {
+            throw new InvalidExcelFileExtension("Reading metadata from (" + excelType + "), is not supported");
+        }
+    }
+
+    /**
+     * converts excel properties into an object
+     *
+     * @param inputStream excel file stream
+     * @param excelType   type of the excel file, xlsx only!
+     * @param type        type of the root object.
+     * @param <T>         type of the root object.
+     * @param options     specifies to change the default behaviour of the poiji. In this case, only the password has an effect
+     * @return the newly created object
+     * @throws PoijiException            if an internal exception occurs during the mapping process.
+     * @throws InvalidExcelFileExtension if the specified excel file extension is invalid.
+     * @throws IllegalCastException      if this Field object is enforcing Java language access control and the underlying field is either inaccessible or final.
+     * @see Poiji#fromExcelProperties(InputStream, PoijiExcelType, Class)
+     */
+    public static <T> T fromExcelProperties(final InputStream inputStream,
+        PoijiExcelType excelType,
+        final Class<T> type,
+        PoijiOptions options) {
+        Objects.requireNonNull(excelType);
+        HSSFPropertyStream hssfPropertyStream = deserializerPropertyStream(excelType, inputStream, options);
+        return hssfPropertyStream.unmarshal(type);
     }
 
     /**

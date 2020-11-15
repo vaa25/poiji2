@@ -1,6 +1,7 @@
 package com.poiji.util;
 
 import com.poiji.annotation.ExcelCellRange;
+import com.poiji.exception.IllegalCastException;
 import com.poiji.exception.PoijiInstantiationException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
@@ -48,5 +49,14 @@ public class ReflectUtil {
         }
 
         return annotations;
+    }
+
+    public static void setFieldData(Field field, Object o, Object instance) {
+        try {
+            field.setAccessible(true);
+            field.set(instance, o);
+        } catch (IllegalAccessException e) {
+            throw new IllegalCastException("Unexpected cast type {" + o + "} of field" + field.getName());
+        }
     }
 }
