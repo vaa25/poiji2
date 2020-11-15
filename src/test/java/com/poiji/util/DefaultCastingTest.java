@@ -1,19 +1,17 @@
 package com.poiji.util;
 
+import com.poiji.config.DefaultCasting;
+import com.poiji.option.PoijiOptions;
+import com.poiji.option.PoijiOptions.PoijiOptionsBuilder;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Locale;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import com.poiji.config.DefaultCasting;
-import com.poiji.option.PoijiOptions;
-import com.poiji.option.PoijiOptions.PoijiOptionsBuilder;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -28,7 +26,7 @@ public class DefaultCastingTest {
     @Before
     public void setUp() {
 
-		casting = new DefaultCasting();
+        casting = new DefaultCasting();
         options = PoijiOptionsBuilder.settings().build();
         Locale.setDefault(Locale.US);
     }
@@ -101,11 +99,35 @@ public class DefaultCastingTest {
     }
 
     @Test
-    public void castBoolean() {
+    public void castBooleanTrue() {
 
         Boolean testVal = (Boolean) casting.castValue(boolean.class, "True", options);
 
         assertEquals(true, testVal);
+    }
+
+    @Test
+    public void castBooleanLibreOfficeTrue() {
+
+        Boolean testVal = (Boolean) casting.castValue(boolean.class, "1 ", options);
+
+        assertEquals(true, testVal);
+    }
+
+    @Test
+    public void castBooleanFalse() {
+
+        Boolean testVal = (Boolean) casting.castValue(boolean.class, " False", options);
+
+        assertEquals(false, testVal);
+    }
+
+    @Test
+    public void castBooleanLibreOfficeFalse() {
+
+        Boolean testVal = (Boolean) casting.castValue(boolean.class, "0", options);
+
+        assertEquals(false, testVal);
     }
 
     @Test
@@ -160,9 +182,9 @@ public class DefaultCastingTest {
     public void castLocalDateUnmatchedDateRegex()  {
 
         PoijiOptions options = PoijiOptionsBuilder.settings()
-                .dateRegex("\\d{2}\\/\\d{2}\\/\\d{4}")
-                .preferNullOverDefault(true)
-                .build();
+            .dateRegex("\\d{2}\\/\\d{2}\\/\\d{4}")
+            .preferNullOverDefault(true)
+            .build();
 
         LocalDate testLocalDate = (LocalDate) casting.castValue(LocalDate.class, "05-01-2016", options);
 

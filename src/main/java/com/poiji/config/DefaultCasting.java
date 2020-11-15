@@ -1,6 +1,7 @@
 package com.poiji.config;
 
 import com.poiji.option.PoijiOptions;
+import com.poiji.parser.BooleanParser;
 import com.poiji.parser.Parsers;
 import java.math.BigDecimal;
 import java.text.ParseException;
@@ -39,6 +40,22 @@ public final class DefaultCasting implements Casting {
     private void logError(String value, Object defaultValue, String sheetName, int row, int col, Exception exception) {
         if (errorLoggingEnabled) {
             errors.add(new DefaultCastingError(value, defaultValue, sheetName, row, col, exception));
+        }
+    }
+
+    private Boolean primitiveBooleanValue(String value, String sheetName, int row, int col) {
+        try {
+            return Parsers.booleans().parse(value);
+        } catch (BooleanParser.BooleanParseException bpe) {
+            return onError(value, sheetName, row, col, bpe, false);
+        }
+    }
+
+    private Boolean booleanValue(String value, String sheetName, int row, int col, PoijiOptions options) {
+        try {
+            return Parsers.booleans().parse(value);
+        } catch (BooleanParser.BooleanParseException bpe) {
+            return onError(value, sheetName, row, col, bpe, options.preferNullOverDefault() ? null : false);
         }
     }
 
@@ -222,10 +239,10 @@ public final class DefaultCasting implements Casting {
             o = floatValue(value, sheetName, row, col, options);
 
         } else if (fieldType == boolean.class) {
-            o = Boolean.valueOf(value);
+            o = primitiveBooleanValue(value, sheetName, row, col);
 
         } else if (fieldType == Boolean.class) {
-            o = value.isEmpty() ? options.preferNullOverDefault() ? null : false : Boolean.valueOf(value);
+            o = booleanValue(value, sheetName, row, col, options);
 
         } else if (fieldType == byte.class) {
             o = Byte.valueOf(value);

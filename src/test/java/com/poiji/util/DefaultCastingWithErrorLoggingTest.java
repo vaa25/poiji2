@@ -4,18 +4,17 @@ import com.poiji.config.DefaultCasting;
 import com.poiji.config.DefaultCastingError;
 import com.poiji.option.PoijiOptions;
 import com.poiji.option.PoijiOptions.PoijiOptionsBuilder;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-
+import com.poiji.parser.BooleanParser;
 import java.math.BigDecimal;
-import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -45,9 +44,9 @@ public class DefaultCastingWithErrorLoggingTest {
     public static Collection<Object[]> data() {
 
         return Arrays.asList(new Object[][]{
-                {EMPTY_SHEET_NAME, EMPTY_ROW, EMPTY_COL},
-                {"Sheet 1", -1, -1},
-                {"Sheet 2", 2, 5}
+            {EMPTY_SHEET_NAME, EMPTY_ROW, EMPTY_COL},
+            {"Sheet 1", -1, -1},
+            {"Sheet 2", 2, 5}
         });
     }
 
@@ -69,8 +68,8 @@ public class DefaultCastingWithErrorLoggingTest {
     public void castPrimitiveIntegerExceptionWithoutLogging() {
 
         PoijiOptions options = PoijiOptionsBuilder.settings()
-                .sheetName(sheetName)
-                .build();
+            .sheetName(sheetName)
+            .build();
 
         String value = "not an int";
 
@@ -86,8 +85,8 @@ public class DefaultCastingWithErrorLoggingTest {
     public void castIntegerDefaultExceptionWithoutLogging() {
 
         PoijiOptions options = PoijiOptionsBuilder.settings()
-                .sheetName(sheetName)
-                .build();
+            .sheetName(sheetName)
+            .build();
 
         String value = "not an Integer";
 
@@ -103,9 +102,9 @@ public class DefaultCastingWithErrorLoggingTest {
     public void castIntegerNullExceptionWithoutLogging() {
 
         PoijiOptions options = PoijiOptionsBuilder.settings()
-                .sheetName(sheetName)
-                .preferNullOverDefault(true)
-                .build();
+            .sheetName(sheetName)
+            .preferNullOverDefault(true)
+            .build();
 
         String value = "not a Integer";
 
@@ -119,8 +118,8 @@ public class DefaultCastingWithErrorLoggingTest {
     public void castPrimitiveIntegerExceptionWithLogging() {
 
         PoijiOptions options = PoijiOptionsBuilder.settings()
-                .sheetName(sheetName)
-                .build();
+            .sheetName(sheetName)
+            .build();
 
         String value = "not an int";
 
@@ -136,8 +135,8 @@ public class DefaultCastingWithErrorLoggingTest {
     public void castIntegerDefaultExceptionWithLogging() {
 
         PoijiOptions options = PoijiOptionsBuilder.settings()
-                .sheetName(sheetName)
-                .build();
+            .sheetName(sheetName)
+            .build();
 
         String value = "not an Integer";
 
@@ -153,9 +152,9 @@ public class DefaultCastingWithErrorLoggingTest {
     public void castIntegerNullExceptionWithLogging() {
 
         PoijiOptions options = PoijiOptionsBuilder.settings()
-                .sheetName(sheetName)
-                .preferNullOverDefault(true)
-                .build();
+            .sheetName(sheetName)
+            .preferNullOverDefault(true)
+            .build();
 
         String value = "not an Integer";
 
@@ -170,8 +169,8 @@ public class DefaultCastingWithErrorLoggingTest {
     public void castPrimitiveLongExceptionWithoutLogging() {
 
         PoijiOptions options = PoijiOptionsBuilder.settings()
-                .sheetName(sheetName)
-                .build();
+            .sheetName(sheetName)
+            .build();
 
         String value = "not an int";
 
@@ -187,8 +186,8 @@ public class DefaultCastingWithErrorLoggingTest {
     public void castLongDefaultExceptionWithoutLogging() {
 
         PoijiOptions options = PoijiOptionsBuilder.settings()
-                .sheetName(sheetName)
-                .build();
+            .sheetName(sheetName)
+            .build();
 
         String value = "not an Long";
 
@@ -204,9 +203,9 @@ public class DefaultCastingWithErrorLoggingTest {
     public void castLongNullExceptionWithoutLogging() {
 
         PoijiOptions options = PoijiOptionsBuilder.settings()
-                .sheetName(sheetName)
-                .preferNullOverDefault(true)
-                .build();
+            .sheetName(sheetName)
+            .preferNullOverDefault(true)
+            .build();
 
         String value = "not a Long";
 
@@ -220,8 +219,8 @@ public class DefaultCastingWithErrorLoggingTest {
     public void castPrimitiveLongExceptionWithLogging() {
 
         PoijiOptions options = PoijiOptionsBuilder.settings()
-                .sheetName(sheetName)
-                .build();
+            .sheetName(sheetName)
+            .build();
 
         String value = "not an int";
 
@@ -237,8 +236,8 @@ public class DefaultCastingWithErrorLoggingTest {
     public void castLongDefaultExceptionWithLogging() {
 
         PoijiOptions options = PoijiOptionsBuilder.settings()
-                .sheetName(sheetName)
-                .build();
+            .sheetName(sheetName)
+            .build();
 
         String value = "not a Long";
 
@@ -254,9 +253,9 @@ public class DefaultCastingWithErrorLoggingTest {
     public void castLongNullExceptionWithLogging() {
 
         PoijiOptions options = PoijiOptionsBuilder.settings()
-                .sheetName(sheetName)
-                .preferNullOverDefault(true)
-                .build();
+            .sheetName(sheetName)
+            .preferNullOverDefault(true)
+            .build();
 
         String value = "not a Long";
 
@@ -271,8 +270,8 @@ public class DefaultCastingWithErrorLoggingTest {
     public void castPrimitiveDoubleExceptionWithoutLogging() {
 
         PoijiOptions options = PoijiOptionsBuilder.settings()
-                .sheetName(sheetName)
-                .build();
+            .sheetName(sheetName)
+            .build();
 
         String value = "not a double";
 
@@ -288,8 +287,8 @@ public class DefaultCastingWithErrorLoggingTest {
     public void castDoubleDefaultExceptionWithoutLogging() {
 
         PoijiOptions options = PoijiOptionsBuilder.settings()
-                .sheetName(sheetName)
-                .build();
+            .sheetName(sheetName)
+            .build();
 
         String value = "not an Double";
 
@@ -305,9 +304,9 @@ public class DefaultCastingWithErrorLoggingTest {
     public void castDoubleNullExceptionWithoutLogging() {
 
         PoijiOptions options = PoijiOptionsBuilder.settings()
-                .sheetName(sheetName)
-                .preferNullOverDefault(true)
-                .build();
+            .sheetName(sheetName)
+            .preferNullOverDefault(true)
+            .build();
 
         String value = "not a Double";
 
@@ -321,8 +320,8 @@ public class DefaultCastingWithErrorLoggingTest {
     public void castPrimitiveDoubleExceptionWithLogging() {
 
         PoijiOptions options = PoijiOptionsBuilder.settings()
-                .sheetName(sheetName)
-                .build();
+            .sheetName(sheetName)
+            .build();
 
         String value = "not an double";
 
@@ -338,8 +337,8 @@ public class DefaultCastingWithErrorLoggingTest {
     public void castDoubleDefaultExceptionWithLogging() {
 
         PoijiOptions options = PoijiOptionsBuilder.settings()
-                .sheetName(sheetName)
-                .build();
+            .sheetName(sheetName)
+            .build();
 
         String value = "not an Double";
 
@@ -355,9 +354,9 @@ public class DefaultCastingWithErrorLoggingTest {
     public void castDoubleNullExceptionWithLogging() {
 
         PoijiOptions options = PoijiOptionsBuilder.settings()
-                .sheetName(sheetName)
-                .preferNullOverDefault(true)
-                .build();
+            .sheetName(sheetName)
+            .preferNullOverDefault(true)
+            .build();
 
         String value = "not a Double";
 
@@ -367,13 +366,63 @@ public class DefaultCastingWithErrorLoggingTest {
         assertSingleCastingErrorPresent(sheetName, row, col, value, null, NumberFormatException.class);
     }
 
+    @Test
+    public void castPrimitiveBooleanExceptionWithLogging() {
+
+        PoijiOptions options = PoijiOptionsBuilder.settings()
+            .sheetName(sheetName)
+            .build();
+
+        String value = "not an boolean";
+
+        Boolean expectedDefault = false;
+
+        Boolean testVal = (Boolean) casting.castValue(boolean.class, value, row, col, options);
+
+        assertEquals(expectedDefault, testVal);
+        assertSingleCastingErrorPresent(sheetName, row, col, value, expectedDefault, BooleanParser.BooleanParseException.class);
+    }
+
+    @Test
+    public void castBooleanDefaultExceptionWithLogging() {
+
+        PoijiOptions options = PoijiOptionsBuilder.settings()
+            .sheetName(sheetName)
+            .build();
+
+        String value = "not an Boolean";
+
+        Boolean expectedDefault = false;
+
+        Boolean testVal = (Boolean) casting.castValue(Boolean.class, value, row, col, options);
+
+        assertEquals(expectedDefault, testVal);
+        assertSingleCastingErrorPresent(sheetName, row, col, value, expectedDefault, BooleanParser.BooleanParseException.class);
+    }
+
+    @Test
+    public void castBooleanNullExceptionWithLogging() {
+
+        PoijiOptions options = PoijiOptionsBuilder.settings()
+            .sheetName(sheetName)
+            .preferNullOverDefault(true)
+            .build();
+
+        String value = "not a Boolean";
+
+        Boolean testVal = (Boolean) casting.castValue(Boolean.class, value, row, col, options);
+
+        assertNull(testVal);
+        assertSingleCastingErrorPresent(sheetName, row, col, value, null, BooleanParser.BooleanParseException.class);
+    }
+
     // Float
     @Test
     public void castPrimitiveFloatExceptionWithoutLogging() {
 
         PoijiOptions options = PoijiOptionsBuilder.settings()
-                .sheetName(sheetName)
-                .build();
+            .sheetName(sheetName)
+            .build();
 
         String value = "not an float";
 
@@ -389,8 +438,8 @@ public class DefaultCastingWithErrorLoggingTest {
     public void castFloatDefaultExceptionWithoutLogging() {
 
         PoijiOptions options = PoijiOptionsBuilder.settings()
-                .sheetName(sheetName)
-                .build();
+            .sheetName(sheetName)
+            .build();
 
         String value = "not an Float";
 
@@ -406,9 +455,9 @@ public class DefaultCastingWithErrorLoggingTest {
     public void castFloatNullExceptionWithoutLogging() {
 
         PoijiOptions options = PoijiOptionsBuilder.settings()
-                .sheetName(sheetName)
-                .preferNullOverDefault(true)
-                .build();
+            .sheetName(sheetName)
+            .preferNullOverDefault(true)
+            .build();
 
         String value = "not a Float";
 
@@ -422,8 +471,8 @@ public class DefaultCastingWithErrorLoggingTest {
     public void castPrimitiveFloatExceptionWithLogging() {
 
         PoijiOptions options = PoijiOptionsBuilder.settings()
-                .sheetName(sheetName)
-                .build();
+            .sheetName(sheetName)
+            .build();
 
         String value = "not an float";
 
@@ -439,8 +488,8 @@ public class DefaultCastingWithErrorLoggingTest {
     public void castFloatDefaultExceptionWithLogging() {
 
         PoijiOptions options = PoijiOptionsBuilder.settings()
-                .sheetName(sheetName)
-                .build();
+            .sheetName(sheetName)
+            .build();
 
         String value = "not an Float";
 
@@ -456,9 +505,9 @@ public class DefaultCastingWithErrorLoggingTest {
     public void castFloatNullExceptionWithLogging() {
 
         PoijiOptions options = PoijiOptionsBuilder.settings()
-                .sheetName(sheetName)
-                .preferNullOverDefault(true)
-                .build();
+            .sheetName(sheetName)
+            .preferNullOverDefault(true)
+            .build();
 
         String value = "not a Float";
 
@@ -473,8 +522,8 @@ public class DefaultCastingWithErrorLoggingTest {
     public void castBigDecimalDefaultExceptionWithoutLogging() {
 
         PoijiOptions options = PoijiOptionsBuilder.settings()
-                .sheetName(sheetName)
-                .build();
+            .sheetName(sheetName)
+            .build();
 
         String value = "not an BigDecimal";
 
@@ -490,9 +539,9 @@ public class DefaultCastingWithErrorLoggingTest {
     public void castBigDecimalNullExceptionWithoutLogging() {
 
         PoijiOptions options = PoijiOptionsBuilder.settings()
-                .sheetName(sheetName)
-                .preferNullOverDefault(true)
-                .build();
+            .sheetName(sheetName)
+            .preferNullOverDefault(true)
+            .build();
 
         String value = "not a BigDecimal";
 
@@ -506,8 +555,8 @@ public class DefaultCastingWithErrorLoggingTest {
     public void castBigDecimalDefaultExceptionWithLogging() {
 
         PoijiOptions options = PoijiOptionsBuilder.settings()
-                .sheetName(sheetName)
-                .build();
+            .sheetName(sheetName)
+            .build();
 
         String value = "not an BigDecimal";
 
@@ -523,9 +572,9 @@ public class DefaultCastingWithErrorLoggingTest {
     public void castBigDecimalNullExceptionWithLogging() {
 
         PoijiOptions options = PoijiOptionsBuilder.settings()
-                .sheetName(sheetName)
-                .preferNullOverDefault(true)
-                .build();
+            .sheetName(sheetName)
+            .preferNullOverDefault(true)
+            .build();
 
         String value = "not a BigDecimal";
 
@@ -542,32 +591,32 @@ public class DefaultCastingWithErrorLoggingTest {
     public void castDateNullExceptionWithoutLogging() {
 
         PoijiOptions options = PoijiOptionsBuilder.settings()
-                .sheetName(sheetName)
-                .preferNullOverDefault(true)
-                .build();
+            .sheetName(sheetName)
+            .preferNullOverDefault(true)
+            .build();
 
         String value = "not a Date";
 
         Date testVal = (Date) casting.castValue(Date.class, value, options);
 
         assertNull(testVal);
-        assertSingleCastingErrorPresent(sheetName, EMPTY_ROW, EMPTY_COL, value, null, ParseException.class);
+        assertSingleCastingErrorPresent(sheetName, EMPTY_ROW, EMPTY_COL, value, null, java.text.ParseException.class);
     }
 
     @Test
     public void castDateNullExceptionWithLogging() {
 
         PoijiOptions options = PoijiOptionsBuilder.settings()
-                .sheetName(sheetName)
-                .preferNullOverDefault(true)
-                .build();
+            .sheetName(sheetName)
+            .preferNullOverDefault(true)
+            .build();
 
         String value = "not a Date";
 
         Date testVal = (Date) casting.castValue(Date.class, value, row, col, options);
 
         assertNull(testVal);
-        assertSingleCastingErrorPresent(sheetName, row, col, value, null, ParseException.class);
+        assertSingleCastingErrorPresent(sheetName, row, col, value, null, java.text.ParseException.class);
     }
 
     // LocalDate
@@ -575,8 +624,8 @@ public class DefaultCastingWithErrorLoggingTest {
     public void castLocalDateDefaultExceptionWithoutLogging() {
 
         PoijiOptions options = PoijiOptionsBuilder.settings()
-                .sheetName(sheetName)
-                .build();
+            .sheetName(sheetName)
+            .build();
 
         String value = "not a LocalDate";
 
@@ -592,9 +641,9 @@ public class DefaultCastingWithErrorLoggingTest {
     public void castLocalDateNullExceptionWithoutLogging() {
 
         PoijiOptions options = PoijiOptionsBuilder.settings()
-                .sheetName(sheetName)
-                .preferNullOverDefault(true)
-                .build();
+            .sheetName(sheetName)
+            .preferNullOverDefault(true)
+            .build();
 
         String value = "not a LocalDate";
 
@@ -608,8 +657,8 @@ public class DefaultCastingWithErrorLoggingTest {
     public void castLocalDateDefaultExceptionWithLogging() {
 
         PoijiOptions options = PoijiOptionsBuilder.settings()
-                .sheetName(sheetName)
-                .build();
+            .sheetName(sheetName)
+            .build();
 
         String value = "not a LocalDate";
 
@@ -625,9 +674,9 @@ public class DefaultCastingWithErrorLoggingTest {
     public void castLocalDateNullExceptionWithLogging() {
 
         PoijiOptions options = PoijiOptionsBuilder.settings()
-                .sheetName(sheetName)
-                .preferNullOverDefault(true)
-                .build();
+            .sheetName(sheetName)
+            .preferNullOverDefault(true)
+            .build();
 
         String value = "not a LocalDate";
 
@@ -642,8 +691,8 @@ public class DefaultCastingWithErrorLoggingTest {
     public void castEnumExceptionWithoutLogging() {
 
         PoijiOptions options = PoijiOptionsBuilder.settings()
-                .sheetName(sheetName)
-                .build();
+            .sheetName(sheetName)
+            .build();
 
         String value = "not an Enum";
 
@@ -657,9 +706,9 @@ public class DefaultCastingWithErrorLoggingTest {
     public void castEnumExceptionWithLogging() {
 
         PoijiOptions options = PoijiOptionsBuilder.settings()
-                .sheetName(sheetName)
-                .preferNullOverDefault(true)
-                .build();
+            .sheetName(sheetName)
+            .preferNullOverDefault(true)
+            .build();
 
         String value = "not an Enum";
 
@@ -674,9 +723,9 @@ public class DefaultCastingWithErrorLoggingTest {
     public void multipleCastingErrorsOnSingleSheetWithoutLogging() {
 
         PoijiOptions options = PoijiOptionsBuilder.settings()
-                .sheetName(sheetName)
-                .preferNullOverDefault(true)
-                .build();
+            .sheetName(sheetName)
+            .preferNullOverDefault(true)
+            .build();
 
         // Error One
         String valueOne = "not an Enum One";
@@ -706,9 +755,9 @@ public class DefaultCastingWithErrorLoggingTest {
     public void multipleCastingErrorsOnSingleSheetWithLogging() {
 
         PoijiOptions options = PoijiOptionsBuilder.settings()
-                .sheetName(sheetName)
-                .preferNullOverDefault(true)
-                .build();
+            .sheetName(sheetName)
+            .preferNullOverDefault(true)
+            .build();
 
         // Error One
         String valueOne = "not an Enum One";
@@ -740,9 +789,9 @@ public class DefaultCastingWithErrorLoggingTest {
         String sheetNameOne = "Sheet One";
 
         PoijiOptions optionsOne = PoijiOptionsBuilder.settings()
-                .sheetName(sheetNameOne)
-                .preferNullOverDefault(true)
-                .build();
+            .sheetName(sheetNameOne)
+            .preferNullOverDefault(true)
+            .build();
 
 
         String valueOne = "not an Enum One";
@@ -755,9 +804,9 @@ public class DefaultCastingWithErrorLoggingTest {
         String sheetNameTwo = "Sheet Two";
 
         PoijiOptions optionsTwo = PoijiOptionsBuilder.settings()
-                .sheetName(sheetNameTwo)
-                .preferNullOverDefault(true)
-                .build();
+            .sheetName(sheetNameTwo)
+            .preferNullOverDefault(true)
+            .build();
 
 
         String valueTwo = "not an Enum Two";
@@ -782,9 +831,9 @@ public class DefaultCastingWithErrorLoggingTest {
         String sheetNameOne = "Sheet One";
 
         PoijiOptions optionsOne = PoijiOptionsBuilder.settings()
-                .sheetName(sheetNameOne)
-                .preferNullOverDefault(true)
-                .build();
+            .sheetName(sheetNameOne)
+            .preferNullOverDefault(true)
+            .build();
 
 
         String valueOne = "not an Enum One";
@@ -797,9 +846,9 @@ public class DefaultCastingWithErrorLoggingTest {
         String sheetNameTwo = "Sheet Two";
 
         PoijiOptions optionsTwo = PoijiOptionsBuilder.settings()
-                .sheetName(sheetNameTwo)
-                .preferNullOverDefault(true)
-                .build();
+            .sheetName(sheetNameTwo)
+            .preferNullOverDefault(true)
+            .build();
 
 
         String valueTwo = "not an Enum Two";
@@ -826,12 +875,12 @@ public class DefaultCastingWithErrorLoggingTest {
     }
 
     private void assertCastingErrorEquals(DefaultCastingError castingError,
-                                          String sheetName,
-                                          int row,
-                                          int col,
-                                          String value,
-                                          Object defaultValue,
-                                          Class<?> exClass) {
+        String sheetName,
+        int row,
+        int col,
+        String value,
+        Object defaultValue,
+        Class<?> exClass) {
         assertEquals(sheetName, castingError.getSheetName());
         assertEquals(row, castingError.getRow());
         assertEquals(col, castingError.getColumn());

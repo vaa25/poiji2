@@ -1,5 +1,6 @@
 package com.poiji.parser;
 
+import java.math.BigDecimal;
 import java.text.NumberFormat;
 
 /**
@@ -7,26 +8,32 @@ import java.text.NumberFormat;
  */
 public class Parsers {
 
+    private static final Parser<Boolean> BOOLEAN_PARSER = new BooleanParser();
+
     private Parsers() {
         // static factory
     }
 
-    public static NumberParser longs() {
+    public static Parser<Number> longs() {
         return integers();
     }
 
-    public static NumberParser integers() {
-        NumberFormat format = NumberFormat.getInstance();
+    public static Parser<Number> integers() {
+        final NumberFormat format = NumberFormat.getInstance();
         format.setParseIntegerOnly(true);
         return new NumberParser(format);
     }
 
-    public static BigDecimalParser bigDecimals() {
+    public static Parser<BigDecimal> bigDecimals() {
         return new BigDecimalParser();
     }
 
-    public static NumberParser numbers() {
+    public static Parser<Number> numbers() {
         return new NumberParser(NumberFormat.getInstance());
+    }
+
+    public static Parser<Boolean> booleans() {
+        return BOOLEAN_PARSER;
     }
 
 }

@@ -202,3 +202,6 @@ poiji.iml
 /build/
 /build/classes/java/main/
 /build/classes/java/test/
+/src/test/resources/ignore.xlsx
+/src/test/resources/write.xlsx
+/src/test/resources/writeStream.xlsx

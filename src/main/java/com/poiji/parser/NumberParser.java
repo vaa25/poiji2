@@ -11,6 +11,7 @@ public class NumberParser implements Parser<Number> {
         this.numberFormat = numberFormat;
     }
 
+    @Override
     public Number parse(String value) {
         return parseNumber(value, numberFormat);
     }
