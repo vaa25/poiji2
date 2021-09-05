@@ -22,6 +22,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
+import static com.poiji.util.PoijiConstants.CSV_EXTENSION;
 import static com.poiji.util.PoijiConstants.XLSX_EXTENSION;
 import static com.poiji.util.PoijiConstants.XLS_EXTENSION;
 
@@ -366,24 +367,32 @@ public final class Poiji {
 
         String extension = files.getExtension(file.getName());
 
-        if (XLS_EXTENSION.equals(extension)) {
-            return UnmarshallerHelper.HSSFInstance(poijiFile, options);
-        } else if (XLSX_EXTENSION.equals(extension)) {
-            return UnmarshallerHelper.XSSFInstance(poijiFile, options);
-        } else {
-            throw new InvalidExcelFileExtension("Invalid file extension (" + extension + "), excepted .xls or .xlsx");
+        switch (extension) {
+            case XLS_EXTENSION:
+                return UnmarshallerHelper.HSSFInstance(poijiFile, options);
+            case XLSX_EXTENSION:
+                return UnmarshallerHelper.XSSFInstance(poijiFile, options);
+            case CSV_EXTENSION:
+                return UnmarshallerHelper.csvInstance(poijiFile, options);
+            default:
+                throw new InvalidExcelFileExtension(
+                    "Invalid file extension (" + extension + "), excepted .xls or .xlsx or .csv");
         }
     }
 
     private static Unmarshaller deserializer(final InputStream inputStream, PoijiExcelType excelType, final PoijiOptions options) {
         final PoijiInputStream<?> poijiInputStream = new PoijiInputStream<>(inputStream);
 
-        if (excelType == PoijiExcelType.XLS) {
-            return UnmarshallerHelper.HSSFInstance(poijiInputStream, options);
-        } else if (excelType == PoijiExcelType.XLSX) {
-            return UnmarshallerHelper.XSSFInstance(poijiInputStream, options);
-        } else {
-            throw new InvalidExcelFileExtension("Invalid file extension (" + excelType + "), excepted .xls or .xlsx");
+        switch (excelType) {
+            case XLS:
+                return UnmarshallerHelper.HSSFInstance(poijiInputStream, options);
+            case XLSX:
+                return UnmarshallerHelper.XSSFInstance(poijiInputStream, options);
+            case CSV:
+                return UnmarshallerHelper.csvInstance(poijiInputStream, options);
+            default:
+                throw new InvalidExcelFileExtension(
+                    "Invalid file extension (" + excelType + "), excepted .xls or .xlsx or .csv");
         }
     }
 

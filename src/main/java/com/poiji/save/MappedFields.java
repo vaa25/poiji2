@@ -27,6 +27,7 @@ public final class MappedFields {
     private final List<Field> unknownCells;
     private final Map<String, Integer> unknownOrders;
     private final PoijiOptions options;
+    private final Map<Field, Collection<String>> unknownFieldsToNames;
 
     public MappedFields(final Class<?> entity, final PoijiOptions options) {
         this.entity = entity;
@@ -35,6 +36,7 @@ public final class MappedFields {
         unknownCells = new ArrayList<>();
         this.unknownOrders = new LinkedHashMap<>();
         this.options = options;
+        unknownFieldsToNames = new HashMap<>();
     }
 
     public MappedFields parseEntity() {
@@ -80,12 +82,15 @@ public final class MappedFields {
     }
 
     private <T> Map<String, Integer> extractUnknownColumnNamesFromData(final Collection<T> data) {
-        final Collection<java.lang.String> unknownNames = new HashSet<>();
+        final Collection<String> unknownNames = new HashSet<>();
         for (final Field unknownCell : unknownCells) {
             for (T instance : data) {
                 try {
                     final Map<String, String> unknownCells = (Map<String, String>) unknownCell.get(instance);
                     if (unknownCells != null) {
+                        unknownFieldsToNames
+                            .computeIfAbsent(unknownCell, field -> new HashSet<>(unknownCells.keySet()))
+                            .addAll(unknownCells.keySet());
                         unknownNames.addAll(unknownCells.keySet());
                     }
                 } catch (IllegalArgumentException | IllegalAccessException e) {
@@ -115,5 +120,9 @@ public final class MappedFields {
 
     public Map<String, Integer> getUnknownOrders() {
         return unknownOrders;
+    }
+
+    public Map<Field, Collection<String>> getUnknownFieldsToNames() {
+        return unknownFieldsToNames;
     }
 }

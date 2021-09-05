@@ -215,16 +215,16 @@ public final class DefaultCasting implements Casting {
             o = primitiveIntegerValue(value, sheetName, row, col);
 
         } else if (fieldType == Integer.class) {
-            o = integerValue(value, sheetName, row, col, options);
+            o = integerValue(trimDecimal(value), sheetName, row, col, options);
 
         } else if (fieldType == BigDecimal.class) {
             o = bigDecimalValue(value, sheetName, row, col, options);
 
         } else if (fieldType == long.class) {
-            o = primitiveLongValue(value, sheetName, row, col);
+            o = primitiveLongValue(trimDecimal(value), sheetName, row, col);
 
         } else if (fieldType == Long.class) {
-            o = longValue(value, sheetName, row, col, options);
+            o = longValue(trimDecimal(value), sheetName, row, col, options);
 
         } else if (fieldType == double.class) {
             o = primitiveDoubleValue(value, sheetName, row, col);
@@ -245,16 +245,16 @@ public final class DefaultCasting implements Casting {
             o = booleanValue(value, sheetName, row, col, options);
 
         } else if (fieldType == byte.class) {
-            o = Byte.valueOf(value);
+            o = Byte.valueOf(trimDecimal(value));
 
         } else if (fieldType == Byte.class) {
-            o = value.isEmpty() ? options.preferNullOverDefault() ? null : (byte) 0 : Byte.valueOf(value);
+            o = value.isEmpty() ? options.preferNullOverDefault() ? null : (byte) 0 : Byte.valueOf(trimDecimal(value));
 
         } else if (fieldType == short.class) {
-            o = Short.valueOf(value);
+            o = Short.valueOf(trimDecimal(value));
 
         } else if (fieldType == Short.class) {
-            o = value.isEmpty() ? options.preferNullOverDefault() ? null : (short) 0 : Short.valueOf(value);
+            o = value.isEmpty() ? options.preferNullOverDefault() ? null : (short) 0 : Short.valueOf(trimDecimal(value));
 
         } else if (fieldType == Date.class) {
             o = dateValue(value, sheetName, row, col, options);
@@ -276,6 +276,18 @@ public final class DefaultCasting implements Casting {
 
         }
         return o;
+    }
+
+    private String trimDecimal(final String string){
+        int i = string.lastIndexOf('.');
+        if (i == -1){
+            i = string.lastIndexOf(',');
+        }
+        if (i == -1){
+            return string;
+        } else {
+            return string.substring(0, i);
+        }
     }
 
     public boolean isErrorLoggingEnabled() {

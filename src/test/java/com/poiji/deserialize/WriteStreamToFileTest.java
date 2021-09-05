@@ -30,7 +30,7 @@ public class WriteStreamToFileTest {
 
     @Parameterized.Parameters
     public static List<String> excel() {
-        return Arrays.asList("src/test/resources/writeStream.xlsx", "src/test/resources/writeStream.xls");
+        return Arrays.asList("src/test/resources/writeStream.xlsx", "src/test/resources/writeStream.xls", "src/test/resources/writeStream.csv");
     }
 
     @Test
@@ -58,6 +58,7 @@ public class WriteStreamToFileTest {
         expected.add(new WriteEntity());
         final PoijiOptions options = PoijiOptions.PoijiOptionsBuilder
             .settings()
+            .csvDelimiter(";")
             .datePattern("dd-MM-yyyy HH:mm:ss")
             .preferNullOverDefault(true)
             .build();

@@ -34,7 +34,7 @@ public class WriteOutputStreamTest {
 
     @Parameterized.Parameters
     public static List<String> excel() {
-        return Arrays.asList("src/test/resources/write.xlsx", "src/test/resources/write.xls");
+        return Arrays.asList("src/test/resources/write.xlsx", "src/test/resources/write.xls", "src/test/resources/write.csv");
     }
 
     @Test
@@ -65,11 +65,12 @@ public class WriteOutputStreamTest {
         expected.add(new WriteEntity());
         final PoijiOptions options = PoijiOptions.PoijiOptionsBuilder
             .settings()
+            .csvDelimiter(";")
             .datePattern("dd-MM-yyyy HH:mm:ss")
             .preferNullOverDefault(true)
             .build();
 
-        Poiji.toExcel(new FileOutputStream(new File(path)), PoijiExcelType.fromFileName(path), WriteEntity.class, expected, options);
+        Poiji.toExcel(new FileOutputStream(path), PoijiExcelType.fromFileName(path), WriteEntity.class, expected, options);
 
         final List<WriteEntity> read = Poiji.fromExcel(new File(path), WriteEntity.class, options);
         read.forEach(writeEntity -> writeEntity.setUnknown(new HashMap<>()));

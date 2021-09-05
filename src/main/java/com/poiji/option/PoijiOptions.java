@@ -44,6 +44,17 @@ public final class PoijiOptions {
     private PoijiLogCellFormat poijiLogCellFormat;
     private PoijiNumberFormat numberFormat;
     private boolean disableXLSXNumberCellFormat;
+    private String csvDelimiter;
+
+
+    public String getCsvDelimiter() {
+        return csvDelimiter;
+    }
+
+    public PoijiOptions setCsvDelimiter(final String csvDelimiter) {
+        this.csvDelimiter = csvDelimiter;
+        return this;
+    }
 
     private PoijiOptions disableXLSXNumberCellFormat(boolean disableXLSXNumberCellFormat) {
         this.disableXLSXNumberCellFormat = disableXLSXNumberCellFormat;
@@ -296,6 +307,7 @@ public final class PoijiOptions {
         private String sheetName;
         private boolean caseInsensitive;
         private boolean namedHeaderMandatory;
+        private String csvDelimiter = ",";
 
         private PoijiOptionsBuilder() {
         }
@@ -427,6 +439,7 @@ public final class PoijiOptions {
                 .setPoijiLogCellFormat(cellFormat)
                 .setPoijiNumberFormat(numberFormat)
                 .setCaseInsensitive(caseInsensitive)
+                .setCsvDelimiter(csvDelimiter)
                 .disableXLSXNumberCellFormat(disabledXLSXNumberCellFormat)
                 .setNamedHeaderMandatory(namedHeaderMandatory);
         }
@@ -607,6 +620,16 @@ public final class PoijiOptions {
          */
         public PoijiOptionsBuilder caseInsensitive(final boolean caseInsensitive) {
             this.caseInsensitive = caseInsensitive;
+            return this;
+        }
+
+        /**
+         * Set CSV delimiter. Default is ','
+         *
+         * @param csvDelimiter fields are mandatory or not
+         */
+        public PoijiOptionsBuilder csvDelimiter(String csvDelimiter) {
+            this.csvDelimiter = csvDelimiter;
             return this;
         }
 

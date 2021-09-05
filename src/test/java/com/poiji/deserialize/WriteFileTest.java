@@ -31,7 +31,7 @@ public class WriteFileTest {
 
     @Parameterized.Parameters
     public static List<String> excel() {
-        return Arrays.asList("src/test/resources/write.xlsx", "src/test/resources/write.xls");
+        return Arrays.asList("src/test/resources/write.xlsx", "src/test/resources/write.xls", "src/test/resources/write.csv");
     }
 
     @Test

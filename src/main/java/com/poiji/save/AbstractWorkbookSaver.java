@@ -46,7 +46,7 @@ public abstract class AbstractWorkbookSaver {
 
     protected <T> void save(final Collection<T> data, final Workbook workbook, final OutputStream outputStream) {
         try {
-            addUnknownColumnNamesFromData(data);
+            mappedFields.addUnknownColumnNamesFromData(data);
             final Sheet sheet = prepareSheet(workbook);
 
             int rowIndex = 1;
@@ -61,15 +61,10 @@ public abstract class AbstractWorkbookSaver {
         }
     }
 
-    private  <T> void addUnknownColumnNamesFromData(final Collection<T> data) {
-        mappedFields.addUnknownColumnNamesFromData(data);
-    }
-
     private void write(final Workbook workbook, final OutputStream outputStream) throws IOException {
         workbook.write(outputStream);
         outputStream.flush();
         outputStream.close();
-        workbook.close();
     }
 
     private Sheet prepareSheet(final Workbook workbook) {

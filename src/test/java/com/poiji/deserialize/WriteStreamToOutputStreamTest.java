@@ -33,7 +33,7 @@ public class WriteStreamToOutputStreamTest {
 
     @Parameterized.Parameters
     public static List<String> excel() {
-        return Arrays.asList("src/test/resources/writeStream.xlsx", "src/test/resources/writeStream.xls");
+        return Arrays.asList("src/test/resources/writeStream.xlsx", "src/test/resources/writeStream.xls", "src/test/resources/writeStream.csv");
     }
 
     @Test
@@ -65,7 +65,7 @@ public class WriteStreamToOutputStreamTest {
             .preferNullOverDefault(true)
             .build();
 
-        Poiji.toExcel(new FileOutputStream(new File(path)), PoijiExcelType.fromFileName(path), WriteEntity.class, expected.stream(), options);
+        Poiji.toExcel(new FileOutputStream(path), PoijiExcelType.fromFileName(path), WriteEntity.class, expected.stream(), options);
 
         final List<WriteEntity> read = Poiji.fromExcel(new File(path), WriteEntity.class, options);
         read.forEach(writeEntity -> writeEntity.setUnknown(new HashMap<>()));

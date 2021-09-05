@@ -14,6 +14,7 @@ public final class PoijiConstants {
         DEFAULT_DATE_TIME_PATTERN);
     public static final String XLS_EXTENSION = ".xls";
     public static final String XLSX_EXTENSION = ".xlsx";
+    public static final String CSV_EXTENSION = ".csv";
     public static final String LOCAL_DATE_CELL_STYLE_INDEX_PROPERTY_NAME = "LocalDateCellStyleIndex";
     public static final String LOCAL_DATE_TIME_CELL_STYLE_INDEX_PROPERTY_NAME = "LocalDateTimeCellStyleIndex";
     public static final String DATE_CELL_STYLE_INDEX_PROPERTY_NAME = "DateCellStyleIndex";

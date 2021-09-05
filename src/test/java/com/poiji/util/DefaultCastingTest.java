@@ -149,11 +149,11 @@ public class DefaultCastingTest {
     }
 
     @Test
-    public void castDoubleToLongException() {
+    public void castDoubleToLongMax() {
 
         Long testVal = (Long) casting.castValue(long.class, "9223372036854775807.1", options);
 
-        assertEquals(Long.valueOf(0), testVal);
+        assertEquals(Long.valueOf(Long.MAX_VALUE), testVal);
     }
 
     @Test
