@@ -6,6 +6,7 @@ import com.poiji.exception.HeaderMissingException;
 import com.poiji.option.PoijiOptions;
 import java.io.File;
 import java.util.Arrays;
+import java.util.List;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -19,12 +20,13 @@ public class MandatoryNamedColumnsTest {
         this.path = path;
     }
 
-    @Parameterized.Parameters(name = "{index}: ({0})={1}")
-    public static Iterable<Object[]> queries() {
-        return Arrays.asList(new Object[][]{
-            {"src/test/resources/person.xlsx"},
-            {"src/test/resources/person.xls"}
-        });
+    @Parameterized.Parameters
+    public static List<String> queries() {
+        return Arrays.asList(
+            "src/test/resources/person.xlsx",
+            "src/test/resources/person.xls",
+            "src/test/resources/person.csv"
+        );
     }
 
     @Test

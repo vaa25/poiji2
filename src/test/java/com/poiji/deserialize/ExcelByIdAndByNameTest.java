@@ -3,13 +3,12 @@ package com.poiji.deserialize;
 import com.poiji.bind.Poiji;
 import com.poiji.deserialize.model.byid.Person;
 import com.poiji.deserialize.model.byname.PersonByName;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import static com.poiji.util.Data.unmarshallingPersons;
 import static org.junit.Assert.assertEquals;
@@ -36,8 +35,10 @@ public class ExcelByIdAndByNameTest {
         return Arrays.asList(new Object[][]{
                 {"src/test/resources/person.xlsx", unmarshallingPersons(), Person.class},
                 {"src/test/resources/person.xls", unmarshallingPersons(), Person.class},
+                {"src/test/resources/person.csv", unmarshallingPersons(), Person.class},
                 {"src/test/resources/person.xlsx", unmarshallingPersons(), PersonByName.class},
-                {"src/test/resources/person.xls", unmarshallingPersons(), PersonByName.class}
+                {"src/test/resources/person.xls", unmarshallingPersons(), PersonByName.class},
+                {"src/test/resources/person.csv", unmarshallingPersons(), PersonByName.class}
         });
     }
 
