@@ -4,13 +4,12 @@ import com.poiji.bind.Poiji;
 import com.poiji.deserialize.model.byid.OrgWithUnknownCells;
 import com.poiji.deserialize.model.byname.OrgWithUnknownCellsByName;
 import com.poiji.option.PoijiOptions;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -29,7 +28,8 @@ public class UnknownCellsIdenticalHeadersTest {
     public static List<String> excel() {
         return Arrays.asList(
                 "src/test/resources/unknown-cells-identical-headers.xlsx",
-                "src/test/resources/unknown-cells-identical-headers.xls"
+                "src/test/resources/unknown-cells-identical-headers.xls",
+                "src/test/resources/unknown-cells-identical-headers.csv"
         );
     }
 
