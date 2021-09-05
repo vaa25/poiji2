@@ -12,7 +12,7 @@ public final class CsvLineReader<T> {
     private final PoijiOptions options;
     private boolean isFirstLine;
     private final Collection<Integer> usedColumns;
-    private int row = 0;
+    private int row = 1;
 
     public CsvLineReader(final Class<T> entity, final PoijiOptions options) {
         this.readMappedFields = new ReadMappedFields(entity, options).parseEntity();
