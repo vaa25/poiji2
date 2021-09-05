@@ -39,15 +39,29 @@ public final class CsvLineReader<T> {
             return null;
         } else {
             final String[] values = line.split(options.getCsvDelimiter());
-            final T instance = ReflectUtil.newInstanceOf(entity);
-            for (int column = 0; column < values.length; column++) {
-                if (usedColumns.contains(column)){
-                    readMappedFields.setCellInInstance(row, column, unwrap(values[column]), instance);
+            if (areValuesHaveData(values)){
+                final T instance = ReflectUtil.newInstanceOf(entity);
+                for (int column = 0; column < values.length; column++) {
+                    if (usedColumns.contains(column)){
+                        readMappedFields.setCellInInstance(row, column, unwrap(values[column]), instance);
+                    }
                 }
+                row++;
+                return instance;
+            } else {
+                row++;
+                return null;
             }
-            row++;
-            return instance;
         }
+    }
+
+    private boolean areValuesHaveData(final String[] values) {
+        for (final String value : values) {
+            if (!value.isEmpty()){
+                return true;
+            }
+        }
+        return false;
     }
 
     private String unwrap(final String value) {
