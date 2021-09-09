@@ -484,12 +484,11 @@ public final class PoijiOptions {
         }
 
         /**
-         * limit a number of rows after the header & skipped rows row. The header & skipped rows are not counted.
+         * limit a number of rows after the header and skipped rows row. The header and skipped rows are not counted.
          *
          * @param limit number
          * @return this
          */
-
         public PoijiOptionsBuilder limit(int limit) {
             if (limit < 1) {
                 throw new PoijiException("limit must be greater than 0");
