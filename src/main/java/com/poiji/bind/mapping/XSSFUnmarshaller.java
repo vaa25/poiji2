@@ -3,8 +3,10 @@ package com.poiji.bind.mapping;
 import com.poiji.bind.Unmarshaller;
 import com.poiji.exception.PoijiException;
 import com.poiji.option.PoijiOptions;
+import com.poiji.save.TransposeUtil;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -20,10 +22,13 @@ import org.apache.poi.xssf.eventusermodel.ReadOnlySharedStringsTable;
 import org.apache.poi.xssf.eventusermodel.XSSFReader;
 import org.apache.poi.xssf.eventusermodel.XSSFReader.SheetIterator;
 import org.apache.poi.xssf.model.StylesTable;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
+
+import static org.apache.poi.openxml4j.opc.PackageAccess.READ_WRITE;
 
 /**
  * Created by hakan on 22/10/2017
@@ -38,6 +43,15 @@ abstract class XSSFUnmarshaller implements Unmarshaller {
 
     protected <T> void unmarshal0(Class<T> type, Consumer<? super T> consumer, OPCPackage open)
             throws ParserConfigurationException, IOException, SAXException, OpenXML4JException {
+        if (options.getTransposed()){
+            if (open.getPackageAccess() == READ_WRITE){
+                final XSSFWorkbook workbook = new XSSFWorkbook(open);
+                TransposeUtil.transpose(workbook);
+                workbook.write(new OutputStream() {@Override public void write(final int b) {}});
+            } else {
+                throw new UnsupportedOperationException("Can't apply transposition for streamed XLSX source");
+            }
+        }
 
         ReadOnlySharedStringsTable readOnlySharedStringsTable = new ReadOnlySharedStringsTable(open);
         XSSFReader workbookReader = new XSSFReader(open);

@@ -3,6 +3,7 @@ package com.poiji.bind.mapping;
 import com.poiji.bind.Unmarshaller;
 import com.poiji.exception.PoijiException;
 import com.poiji.option.PoijiOptions;
+import com.poiji.save.TransposeUtil;
 import com.poiji.util.ReflectUtil;
 import java.io.IOException;
 import java.util.Optional;
@@ -31,6 +32,9 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
     @Override
     public <T> void unmarshal(Class<T> type, Consumer<? super T> consumer) {
         try (final Workbook workbook = workbook()) {
+            if (options.getTransposed()){
+                TransposeUtil.transpose(workbook);
+            }
             final Optional<String> maybeSheetName = SheetNameExtractor.getSheetName(type, options);
 
             final Sheet sheet = this.getSheetToProcess(workbook, options, maybeSheetName.orElse(null));

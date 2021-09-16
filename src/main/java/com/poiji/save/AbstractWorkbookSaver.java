@@ -62,6 +62,9 @@ public abstract class AbstractWorkbookSaver {
     }
 
     private void write(final Workbook workbook, final OutputStream outputStream) throws IOException {
+        if (options.getTransposed()){
+            TransposeUtil.transpose(workbook);
+        }
         workbook.write(outputStream);
         outputStream.flush();
         outputStream.close();
