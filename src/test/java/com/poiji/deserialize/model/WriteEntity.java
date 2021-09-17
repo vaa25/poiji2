@@ -2,6 +2,7 @@ package com.poiji.deserialize.model;
 
 import com.poiji.annotation.ExcelCell;
 import com.poiji.annotation.ExcelCellName;
+import com.poiji.annotation.ExcelParseExceptions;
 import com.poiji.annotation.ExcelSheet;
 import com.poiji.annotation.ExcelUnknownCells;
 import java.math.BigDecimal;
@@ -52,6 +53,8 @@ public final class WriteEntity {
     private short primitiveShort;
     @ExcelCellName("Short")
     private Short wrappedShort;
+    @ExcelParseExceptions
+    private Map<String, Exception> exceptions;
 
     public long getPrimitiveLong() {
         return primitiveLong;
@@ -212,6 +215,15 @@ public final class WriteEntity {
 
     public WriteEntity setWrappedShort(final Short wrappedShort) {
         this.wrappedShort = wrappedShort;
+        return this;
+    }
+
+    public Map<String, Exception> getExceptions() {
+        return exceptions;
+    }
+
+    public WriteEntity setExceptions(final Map<String, Exception> exceptions) {
+        this.exceptions = exceptions;
         return this;
     }
 

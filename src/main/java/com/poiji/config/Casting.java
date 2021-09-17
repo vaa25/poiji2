@@ -11,4 +11,8 @@ public interface Casting {
 
     Object castValue(Class<?> fieldType, String value, int row, int column, PoijiOptions options);
 
+    default Exception getException(){
+        return null;
+    }
+
 }

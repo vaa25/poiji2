@@ -21,6 +21,7 @@ import java.util.List;
  */
 public final class DefaultCasting implements Casting {
     private final boolean errorLoggingEnabled;
+    private Exception exception;
 
     private final List<DefaultCastingError> errors = new ArrayList<>();
 
@@ -38,6 +39,7 @@ public final class DefaultCasting implements Casting {
     }
 
     private void logError(String value, Object defaultValue, String sheetName, int row, int col, Exception exception) {
+        this.exception = exception;
         if (errorLoggingEnabled) {
             errors.add(new DefaultCastingError(value, defaultValue, sheetName, row, col, exception));
         }
@@ -56,6 +58,38 @@ public final class DefaultCasting implements Casting {
             return Parsers.booleans().parse(value);
         } catch (BooleanParser.BooleanParseException bpe) {
             return onError(value, sheetName, row, col, bpe, options.preferNullOverDefault() ? null : false);
+        }
+    }
+
+    private Byte byteValue(String value, String sheetName, int row, int col, PoijiOptions options) {
+        try {
+            return value.isEmpty() ? options.preferNullOverDefault() ? null : (byte) 0 : Byte.valueOf(trimDecimal(value));
+        } catch (Exception e) {
+            return onError(value, sheetName, row, col, e, options.preferNullOverDefault() ? null : (byte)0);
+        }
+    }
+
+    private byte primitiveByteValue(String value, String sheetName, int row, int col) {
+        try {
+            return value.isEmpty() ? (byte) 0 : Byte.parseByte(trimDecimal(value));
+        } catch (Exception e) {
+            return onError(value, sheetName, row, col, e, (byte)0);
+        }
+    }
+
+    private Short shortValue(String value, String sheetName, int row, int col, PoijiOptions options) {
+        try {
+            return value.isEmpty() ? options.preferNullOverDefault() ? null : (short) 0 : Short.valueOf(trimDecimal(value));
+        } catch (Exception e) {
+            return onError(value, sheetName, row, col, e, options.preferNullOverDefault() ? null : (short)0);
+        }
+    }
+
+    private short primitiveShortValue(String value, String sheetName, int row, int col) {
+        try {
+            return value.isEmpty() ? (short) 0 : Short.parseShort(trimDecimal(value));
+        } catch (Exception e) {
+            return onError(value, sheetName, row, col, e, (short)0);
         }
     }
 
@@ -204,7 +238,7 @@ public final class DefaultCasting implements Casting {
 
     @Override
     public Object castValue(Class<?> fieldType, String rawValue, int row, int col, PoijiOptions options) {
-
+        this.exception = null;
         String sheetName = options.getSheetName();
 
         String value = options.trimCellValue() ? rawValue.trim() : rawValue;
@@ -245,16 +279,16 @@ public final class DefaultCasting implements Casting {
             o = booleanValue(value, sheetName, row, col, options);
 
         } else if (fieldType == byte.class) {
-            o = Byte.valueOf(trimDecimal(value));
+            o = primitiveByteValue(value, sheetName, row, col);
 
         } else if (fieldType == Byte.class) {
-            o = value.isEmpty() ? options.preferNullOverDefault() ? null : (byte) 0 : Byte.valueOf(trimDecimal(value));
+            o = byteValue(value, sheetName, row, col, options);;
 
         } else if (fieldType == short.class) {
-            o = Short.valueOf(trimDecimal(value));
+            o = primitiveShortValue(value, sheetName, row, col);
 
         } else if (fieldType == Short.class) {
-            o = value.isEmpty() ? options.preferNullOverDefault() ? null : (short) 0 : Short.valueOf(trimDecimal(value));
+            o = shortValue(value, sheetName, row, col, options);;
 
         } else if (fieldType == Date.class) {
             o = dateValue(value, sheetName, row, col, options);
@@ -276,6 +310,11 @@ public final class DefaultCasting implements Casting {
 
         }
         return o;
+    }
+
+    @Override
+    public Exception getException() {
+        return this.exception;
     }
 
     private String trimDecimal(final String string){
