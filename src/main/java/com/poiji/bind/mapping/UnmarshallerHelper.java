@@ -26,10 +26,6 @@ public final class UnmarshallerHelper {
         return new XSSFUnmarshallerStream(poijiInputStream, options);
     }
 
-    public static Unmarshaller csvInstance(PoijiFile<?> poijiFile, PoijiOptions options) {
-        return new CsvUnmarshallerFile(poijiFile, options);
-    }
-
     public static Unmarshaller csvInstance(PoijiInputStream<?> poijiInputStream, PoijiOptions options) {
         return new CsvUnmarshallerStream(poijiInputStream, options);
     }

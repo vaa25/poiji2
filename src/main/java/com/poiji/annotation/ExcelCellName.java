@@ -24,7 +24,7 @@ public @interface ExcelCellName {
     String value();
 
     /**
-     * Specifies the column order in saved file
+     * Specifies 0-based column order in saved file.
      *
      * @return column order
      */

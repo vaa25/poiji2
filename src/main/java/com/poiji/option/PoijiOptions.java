@@ -46,6 +46,16 @@ public final class PoijiOptions {
     private boolean disableXLSXNumberCellFormat;
     private String csvDelimiter;
     private boolean transposed;
+    private String charset;
+
+    public String getCharset() {
+        return charset;
+    }
+
+    public PoijiOptions setCharset(final String charset) {
+        this.charset = charset;
+        return this;
+    }
 
     public boolean getTransposed() {
         return transposed;
@@ -317,6 +327,7 @@ public final class PoijiOptions {
         private boolean caseInsensitive;
         private boolean namedHeaderMandatory;
         private boolean transposed;
+        private String charset = "UTF-8";
         private String csvDelimiter = ",";
 
         private PoijiOptionsBuilder() {
@@ -324,6 +335,11 @@ public final class PoijiOptions {
 
         private PoijiOptionsBuilder(int skip) {
             this.skip = skip;
+        }
+
+        public PoijiOptionsBuilder setCharset(final String charset) {
+            this.charset = charset;
+            return this;
         }
 
         /**
@@ -460,6 +476,7 @@ public final class PoijiOptions {
                 .setCsvDelimiter(csvDelimiter)
                 .disableXLSXNumberCellFormat(disabledXLSXNumberCellFormat)
                 .setTransposed(transposed)
+                .setCharset(charset)
                 .setNamedHeaderMandatory(namedHeaderMandatory);
         }
 

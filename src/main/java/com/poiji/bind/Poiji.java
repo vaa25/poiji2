@@ -13,6 +13,8 @@ import com.poiji.option.PoijiOptions.PoijiOptionsBuilder;
 import com.poiji.save.FileSaverFactory;
 import com.poiji.util.Files;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -364,19 +366,21 @@ public final class Poiji {
 
     private static Unmarshaller deserializer(final File file, final PoijiOptions options) {
         final PoijiFile<?> poijiFile = new PoijiFile<>(file);
-
-        String extension = files.getExtension(file.getName());
-
-        switch (extension) {
-            case XLS_EXTENSION:
-                return UnmarshallerHelper.HSSFInstance(poijiFile, options);
-            case XLSX_EXTENSION:
-                return UnmarshallerHelper.XSSFInstance(poijiFile, options);
-            case CSV_EXTENSION:
-                return UnmarshallerHelper.csvInstance(poijiFile, options);
-            default:
-                throw new InvalidExcelFileExtension(
-                    "Invalid file extension (" + extension + "), excepted .xls or .xlsx or .csv");
+        final String extension = files.getExtension(file.getName());
+        try {
+            switch (extension) {
+                case XLS_EXTENSION:
+                    return UnmarshallerHelper.HSSFInstance(poijiFile, options);
+                case XLSX_EXTENSION:
+                    return UnmarshallerHelper.XSSFInstance(poijiFile, options);
+                case CSV_EXTENSION:
+                    return UnmarshallerHelper.csvInstance(new PoijiInputStream<>(new FileInputStream(poijiFile.file())), options);
+                default:
+                    throw new InvalidExcelFileExtension(
+                        "Invalid file extension (" + extension + "), excepted .xls or .xlsx or .csv");
+            }
+        } catch (FileNotFoundException e) {
+            throw new PoijiException(e.getMessage(), e);
         }
     }
 
