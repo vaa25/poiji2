@@ -1,6 +1,7 @@
 package com.poiji.deserialize;
 
 import com.poiji.bind.Poiji;
+import com.poiji.deserialize.model.byname.PersonByNameWithMandatoryColumn;
 import com.poiji.deserialize.model.byname.PersonByNameWithMissingColumn;
 import com.poiji.exception.HeaderMissingException;
 import com.poiji.option.PoijiOptions;
@@ -43,6 +44,15 @@ public class MandatoryNamedColumnsTest {
         Poiji.fromExcel(new File(path), PersonByNameWithMissingColumn.class, PoijiOptions.PoijiOptionsBuilder
             .settings()
             .namedHeaderMandatory(true)
+            .build());
+    }
+
+    @Test(expected = HeaderMissingException.class)
+    public void testExcelMandatoryColumnFail() {
+
+        Poiji.fromExcel(new File(path), PersonByNameWithMandatoryColumn.class, PoijiOptions.PoijiOptionsBuilder
+            .settings()
+            .namedHeaderMandatory(false)
             .build());
     }
 }

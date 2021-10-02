@@ -38,6 +38,7 @@ public final class HSSFReadMappedFields extends ReadMappedFields{
                 parseColumnName(columnOrder, cell.getStringCellValue());
             }
         }
+        validateMandatoryNameColumns();
     }
 
 }

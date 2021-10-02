@@ -3,12 +3,9 @@ package com.poiji.deserialize.model.byname;
 import com.poiji.annotation.ExcelCellName;
 import com.poiji.annotation.ExcelRow;
 
-/**
- * Created by ar on 9/03/2018.
- */
-public class PersonByNameWithMissingColumn {
+public class PersonByNameWithMandatoryColumn {
 
-    @ExcelCellName(value = "Name", mandatory = true)
+    @ExcelCellName("Name")
     protected String name;
 
     @ExcelCellName("Address")
@@ -20,7 +17,7 @@ public class PersonByNameWithMissingColumn {
     @ExcelCellName("Email")
     protected String email;
 
-    @ExcelCellName("This column will be missing")
+    @ExcelCellName(value = "This column will be missing", mandatory = true)
     protected String missingColumn;
 
     @ExcelRow

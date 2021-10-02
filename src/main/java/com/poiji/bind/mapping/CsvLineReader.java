@@ -36,6 +36,7 @@ public final class CsvLineReader<T> {
                     usedColumns.add(i);
                 }
             }
+            readMappedFields.validateMandatoryNameColumns();
             return null;
         } else {
             final String[] values = line.split(options.getCsvDelimiter());

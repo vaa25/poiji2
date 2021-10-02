@@ -65,8 +65,11 @@ public class ReadMappedFields {
         final List<Field> withoutExcelCellName = parseExcelCellName(withoutUnknownCells);
         final List<Field> withoutExcelRow = parseExcelRow(withoutExcelCellName);
         parseExcelError(withoutExcelRow);
-        AnnotationUtil.validateMandatoryNameColumns(options, entity, columnNames);
         return this;
+    }
+
+    public void validateMandatoryNameColumns(){
+        AnnotationUtil.validateMandatoryNameColumns(options, entity, columnNames);
     }
 
     private List<Field> parseExcelWriteOnly(final List<Field> fields) {

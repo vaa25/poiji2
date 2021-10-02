@@ -6,7 +6,10 @@ import com.poiji.option.PoijiOptions;
 import java.util.Collection;
 import java.util.Set;
 import java.util.function.BiPredicate;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 /**
  * Created by hakan on 2.05.2020
@@ -23,23 +26,32 @@ public class AnnotationUtil {
     public static <T> void validateMandatoryNameColumns(PoijiOptions options,
                                                         Class<T> modelType,
                                                         Collection<String> headerNames) {
-        if (options.getNamedHeaderMandatory()) {
-            Collection<ExcelCellName> excelCellNames = ReflectUtil.findRecursivePoijiAnnotations(modelType,
-                    ExcelCellName.class);
+        final Collection<String> excelCellNames = ReflectUtil
+            .findRecursivePoijiAnnotations(modelType, ExcelCellName.class)
+            .stream()
+            .filter(excelCellName -> options.getNamedHeaderMandatory() || excelCellName.mandatory())
+            .flatMap(AnnotationUtil::getNames)
+            .collect(toList());
 
-            BiPredicate<String, String> comparator = options.getCaseInsensitive()
-                    ? String::equalsIgnoreCase
-                    : String::equals;
+        final BiPredicate<String, String> comparator = options.getCaseInsensitive()
+            ? String::equalsIgnoreCase
+            : String::equals;
 
-            Set<String> missingHeaders = excelCellNames.stream()
-                    .filter(excelCellName -> headerNames.stream()
-                            .noneMatch(title -> comparator.test(excelCellName.value(), title)))
-                    .map(ExcelCellName::value)
-                    .collect(Collectors.toSet());
+        final Set<String> missingHeaders = excelCellNames
+            .stream()
+            .filter(excelCellName -> headerNames.stream().noneMatch(title -> comparator.test(excelCellName, title)))
+            .collect(toSet());
 
-            if (!missingHeaders.isEmpty()) {
-                throw new HeaderMissingException("Some headers are missing in the sheet: " + missingHeaders);
-            }
+        if (!missingHeaders.isEmpty()) {
+            throw new HeaderMissingException("Some headers are missing in the sheet: " + missingHeaders);
+        }
+    }
+
+    private static Stream<String> getNames(final ExcelCellName excelCellName) {
+        if (excelCellName.columnNameDelimiter().isEmpty()){
+            return Stream.of(excelCellName.value());
+        } else {
+            return Stream.of(excelCellName.value().split(excelCellName.columnNameDelimiter()));
         }
     }
 }

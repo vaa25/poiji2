@@ -54,6 +54,10 @@ final class PoijiHandler<T> implements SheetContentsHandler {
         if (rowNum + 1 > options.skip()) {
             consumer.accept(instance);
         }
+
+        if (rowNum <= options.getHeaderStart()) {
+            mappedFields.validateMandatoryNameColumns();
+        }
     }
 
     @Override

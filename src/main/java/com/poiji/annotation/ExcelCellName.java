@@ -41,4 +41,9 @@ public @interface ExcelCellName {
      * @return delimiter for column multiname.
      */
     String columnNameDelimiter() default "";
+
+    /**
+     * Set true if this header is mandatory, otherwise false
+     */
+    boolean mandatory() default false;
 }
