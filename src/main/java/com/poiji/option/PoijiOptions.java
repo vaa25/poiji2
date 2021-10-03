@@ -5,6 +5,8 @@ import com.poiji.bind.mapping.PoijiLogCellFormat;
 import com.poiji.bind.mapping.PoijiNumberFormat;
 import com.poiji.config.Casting;
 import com.poiji.config.DefaultCasting;
+import com.poiji.config.DefaultFormatting;
+import com.poiji.config.Formatting;
 import com.poiji.exception.PoijiException;
 import com.poiji.save.ToCellCasting;
 import java.time.format.DateTimeFormatter;
@@ -40,6 +42,7 @@ public final class PoijiOptions {
     private int headerStart;
     private String sheetName;
     private boolean caseInsensitive;
+    private boolean ignoreWhitespaces;
     private boolean namedHeaderMandatory;
     private PoijiLogCellFormat poijiLogCellFormat;
     private PoijiNumberFormat numberFormat;
@@ -48,12 +51,31 @@ public final class PoijiOptions {
     private boolean transposed;
     private String charset;
     private String listDelimiter;
+    private Formatting formatting;
+
+    public boolean getIgnoreWhitespaces() {
+        return ignoreWhitespaces;
+    }
+
+    private PoijiOptions setIgnoreWhitespaces(final boolean ignoreWhitespaces) {
+        this.ignoreWhitespaces = ignoreWhitespaces;
+        return this;
+    }
+
+    public Formatting getFormatting() {
+        return formatting;
+    }
+
+    private PoijiOptions setFormatting(final Formatting formatting) {
+        this.formatting = formatting;
+        return this;
+    }
 
     public String getListDelimiter() {
         return listDelimiter;
     }
 
-    public PoijiOptions setListDelimiter(final String listDelimiter) {
+    private PoijiOptions setListDelimiter(final String listDelimiter) {
         this.listDelimiter = listDelimiter;
         return this;
     }
@@ -71,7 +93,7 @@ public final class PoijiOptions {
         return transposed;
     }
 
-    public PoijiOptions setTransposed(final boolean transposed) {
+    private PoijiOptions setTransposed(final boolean transposed) {
         this.transposed = transposed;
         return this;
     }
@@ -80,7 +102,7 @@ public final class PoijiOptions {
         return csvDelimiter;
     }
 
-    public PoijiOptions setCsvDelimiter(final String csvDelimiter) {
+    private PoijiOptions setCsvDelimiter(final String csvDelimiter) {
         this.csvDelimiter = csvDelimiter;
         return this;
     }
@@ -125,7 +147,7 @@ public final class PoijiOptions {
         return limit;
     }
 
-    public PoijiOptions setLimit(int limit) {
+    private PoijiOptions setLimit(int limit) {
         this.limit = limit;
         return this;
     }
@@ -215,7 +237,7 @@ public final class PoijiOptions {
         return trimCellValue;
     }
 
-    public PoijiOptions setTrimCellValue(boolean trimCellValue) {
+    private PoijiOptions setTrimCellValue(boolean trimCellValue) {
         this.trimCellValue = trimCellValue;
         return this;
     }
@@ -224,7 +246,7 @@ public final class PoijiOptions {
         return casting;
     }
 
-    public PoijiOptions setCasting(Casting casting) {
+    private PoijiOptions setCasting(Casting casting) {
         this.casting = casting;
         return this;
     }
@@ -296,7 +318,7 @@ public final class PoijiOptions {
         return caseInsensitive;
     }
 
-    public PoijiOptions setCaseInsensitive(final boolean caseInsensitive) {
+    private PoijiOptions setCaseInsensitive(final boolean caseInsensitive) {
         this.caseInsensitive = caseInsensitive;
         return this;
     }
@@ -305,7 +327,7 @@ public final class PoijiOptions {
         return namedHeaderMandatory;
     }
 
-    public PoijiOptions setNamedHeaderMandatory(boolean namedHeaderMandatory) {
+    private PoijiOptions setNamedHeaderMandatory(boolean namedHeaderMandatory) {
         this.namedHeaderMandatory = namedHeaderMandatory;
         return this;
     }
@@ -335,17 +357,43 @@ public final class PoijiOptions {
         private int limit = 0;
         private String sheetName;
         private boolean caseInsensitive;
+        private boolean ignoreWhitespaces;
         private boolean namedHeaderMandatory;
         private boolean transposed;
         private String charset = "UTF-8";
         private String csvDelimiter = ",";
         private String listDelimiter = ",";
+        private Formatting formatting = new DefaultFormatting();
 
         private PoijiOptionsBuilder() {
         }
 
         private PoijiOptionsBuilder(int skip) {
             this.skip = skip;
+        }
+
+        /**
+         * Ignore white space before and after column names for annotation {@link ExcelCellName}.
+         * Default - false.
+         *
+         * @param ignoreWhitespaces true or false
+         */
+        public PoijiOptionsBuilder ignoreWhitespaces(final boolean ignoreWhitespaces) {
+            this.ignoreWhitespaces = ignoreWhitespaces;
+            return this;
+        }
+
+        /**
+         * Use a custom excel header format implementation
+         *
+         * @param formatting custom header format implementation
+         * @return this
+         */
+        public PoijiOptionsBuilder withFormatting(Formatting formatting) {
+            Objects.requireNonNull(formatting);
+
+            this.formatting = formatting;
+            return this;
         }
 
         public PoijiOptionsBuilder setCharset(final String charset) {
@@ -484,13 +532,16 @@ public final class PoijiOptions {
                 .setPoijiLogCellFormat(cellFormat)
                 .setPoijiNumberFormat(numberFormat)
                 .setCaseInsensitive(caseInsensitive)
+                .setIgnoreWhitespaces(ignoreWhitespaces)
                 .setCsvDelimiter(csvDelimiter)
                 .setListDelimiter(listDelimiter)
                 .disableXLSXNumberCellFormat(disabledXLSXNumberCellFormat)
                 .setTransposed(transposed)
                 .setCharset(charset)
+                .setFormatting(formatting)
                 .setNamedHeaderMandatory(namedHeaderMandatory);
         }
+
 
         /**
          * set sheet index, default is 0

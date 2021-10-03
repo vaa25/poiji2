@@ -121,9 +121,7 @@ public class ReadMappedFields {
                     if (order != ABSENT_ORDER && !orderedFields.containsKey(order)) {
                         orderedFields.put(order, field);
                     }
-                    final String name = options.getCaseInsensitive()
-                        ? possibleFieldName.toLowerCase()
-                        : possibleFieldName;
+                    final String name = options.getFormatting().transform(options, possibleFieldName);
                     namedFields.put(name, field);
                 }
                 field.setAccessible(true);
@@ -183,17 +181,17 @@ public class ReadMappedFields {
         if (superClassFields != null) {
             superClassFields.parseColumnName(columnOrder, columnName);
         }
-        final String uniqueColumnName = getUniqueColumnName(columnOrder, columnName);
-        final String insensitiveColumnName = options.getCaseInsensitive()
-            ? uniqueColumnName.toLowerCase()
-            : uniqueColumnName;
+        final String transformedColumnName = options.getFormatting().transform(options, columnName);
+        final String uniqueColumnName = getUniqueColumnName(columnOrder, transformedColumnName);
+        columnNames.add(uniqueColumnName);
+
         if (!orderedFields.containsKey(columnOrder)) {
-            if (namedFields.containsKey(insensitiveColumnName)) {
-                orderedFields.put(columnOrder, namedFields.get(insensitiveColumnName));
+            if (namedFields.containsKey(uniqueColumnName)) {
+                orderedFields.put(columnOrder, namedFields.get(uniqueColumnName));
             } else {
                 if (unknownFields.isEmpty()) {
                     for (final ReadMappedFields rangeField : rangeFields.values()) {
-                        rangeField.parseColumnName(columnOrder, insensitiveColumnName);
+                        rangeField.parseColumnName(columnOrder, uniqueColumnName);
                     }
                 } else {
                     unknownColumns.put(columnOrder, uniqueColumnName);
@@ -203,11 +201,9 @@ public class ReadMappedFields {
     }
 
     private String getUniqueColumnName(final int columnIndex, final String columnName) {
-        final String result = columnNames.contains(columnName) || columnName.isEmpty()
+        return columnNames.contains(columnName) || columnName.isEmpty()
             ? columnName + "@" + columnIndex
             : columnName;
-        columnNames.add(result);
-        return result;
     }
 
     private void setFieldData(Field field, Object o, Object instance) {

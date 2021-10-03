@@ -39,7 +39,10 @@ public class AnnotationUtil {
 
         final Set<String> missingHeaders = excelCellNames
             .stream()
-            .filter(excelCellName -> headerNames.stream().noneMatch(title -> comparator.test(excelCellName, title)))
+            .filter(excelCellName -> {
+                final String transformed = options.getFormatting().transform(options, excelCellName);
+                return headerNames.stream().noneMatch(title -> comparator.test(transformed, title));
+            })
             .collect(toSet());
 
         if (!missingHeaders.isEmpty()) {

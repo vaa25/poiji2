@@ -237,7 +237,7 @@ public class DefaultCastingTest {
     @Test
     //ISSUE #55 : additional functionality, trim string values
     public void trimStringTrue() {
-        PoijiOptions options = PoijiOptionsBuilder.settings().build().setTrimCellValue(true);
+        PoijiOptions options = PoijiOptionsBuilder.settings().trimCellValue(true).build();
         String testVal = (String) casting.castValue(String.class, "    value    ", options);
         assertEquals("value", testVal);
     }
@@ -245,7 +245,7 @@ public class DefaultCastingTest {
     @Test
     //ISSUE #55 : additional functionality, trim string values
     public void trimStringFalse() {
-        PoijiOptions options = PoijiOptionsBuilder.settings().build().setTrimCellValue(false);
+        PoijiOptions options = PoijiOptionsBuilder.settings().trimCellValue(false).build();
         String testVal = (String) casting.castValue(String.class, "    value    ", options);
         assertEquals("    value    ", testVal);
     }
