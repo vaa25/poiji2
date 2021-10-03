@@ -1,6 +1,7 @@
 package com.poiji.config;
 
 import com.poiji.option.PoijiOptions;
+import java.lang.reflect.Field;
 
 /**
  * A casting interface to build a custom poiji configuration.
@@ -9,7 +10,7 @@ import com.poiji.option.PoijiOptions;
  */
 public interface Casting {
 
-    Object castValue(Class<?> fieldType, String value, int row, int column, PoijiOptions options);
+    Object castValue(Field field, String value, int row, int column, PoijiOptions options);
 
     default Exception getException(){
         return null;

@@ -1,8 +1,12 @@
 package com.poiji.config;
 
+import com.poiji.exception.PoijiException;
 import com.poiji.option.PoijiOptions;
 import com.poiji.parser.BooleanParser;
 import com.poiji.parser.Parsers;
+import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -12,14 +16,23 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Stream;
+
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 /**
  * Created by hakan on 22/01/2017.
  */
-public final class DefaultCasting implements Casting {
+public class DefaultCasting implements Casting {
     private final boolean errorLoggingEnabled;
     private Exception exception;
 
@@ -232,84 +245,88 @@ public final class DefaultCasting implements Casting {
                 });
     }
 
-    public Object castValue(Class<?> fieldType, String value, PoijiOptions options) {
-        return castValue(fieldType, value, -1, -1, options);
+    @Override
+    public Object castValue(Field field, String rawValue, int row, int col, PoijiOptions options) {
+        Class<?> fieldType = field.getType();
+        return getValueObject(field, row, col, options, rawValue, fieldType);
     }
 
-    @Override
-    public Object castValue(Class<?> fieldType, String rawValue, int row, int col, PoijiOptions options) {
+    protected Object getValueObject(Field field, int row, int col, PoijiOptions options, String rawValue, Class<?> fieldType) {
         this.exception = null;
         String sheetName = options.getSheetName();
 
         String value = options.trimCellValue() ? rawValue.trim() : rawValue;
 
-        Object o;
-
         if (fieldType == int.class) {
-            o = primitiveIntegerValue(value, sheetName, row, col);
+            return primitiveIntegerValue(value, sheetName, row, col);
 
         } else if (fieldType == Integer.class) {
-            o = integerValue(trimDecimal(value), sheetName, row, col, options);
+            return integerValue(trimDecimal(value), sheetName, row, col, options);
 
         } else if (fieldType == BigDecimal.class) {
-            o = bigDecimalValue(value, sheetName, row, col, options);
+            return bigDecimalValue(value, sheetName, row, col, options);
 
         } else if (fieldType == long.class) {
-            o = primitiveLongValue(trimDecimal(value), sheetName, row, col);
+            return primitiveLongValue(trimDecimal(value), sheetName, row, col);
 
         } else if (fieldType == Long.class) {
-            o = longValue(trimDecimal(value), sheetName, row, col, options);
+            return longValue(trimDecimal(value), sheetName, row, col, options);
 
         } else if (fieldType == double.class) {
-            o = primitiveDoubleValue(value, sheetName, row, col);
+            return primitiveDoubleValue(value, sheetName, row, col);
 
         } else if (fieldType == Double.class) {
-            o = doubleValue(value, sheetName, row, col, options);
+            return doubleValue(value, sheetName, row, col, options);
 
         } else if (fieldType == float.class) {
-            o = primitiveFloatValue(value, sheetName, row, col);
+            return primitiveFloatValue(value, sheetName, row, col);
 
         } else if (fieldType == Float.class) {
-            o = floatValue(value, sheetName, row, col, options);
+            return floatValue(value, sheetName, row, col, options);
 
         } else if (fieldType == boolean.class) {
-            o = primitiveBooleanValue(value, sheetName, row, col);
+            return primitiveBooleanValue(value, sheetName, row, col);
 
         } else if (fieldType == Boolean.class) {
-            o = booleanValue(value, sheetName, row, col, options);
+            return booleanValue(value, sheetName, row, col, options);
 
         } else if (fieldType == byte.class) {
-            o = primitiveByteValue(value, sheetName, row, col);
+            return primitiveByteValue(value, sheetName, row, col);
 
         } else if (fieldType == Byte.class) {
-            o = byteValue(value, sheetName, row, col, options);;
+            return byteValue(value, sheetName, row, col, options);
 
         } else if (fieldType == short.class) {
-            o = primitiveShortValue(value, sheetName, row, col);
+            return primitiveShortValue(value, sheetName, row, col);
 
         } else if (fieldType == Short.class) {
-            o = shortValue(value, sheetName, row, col, options);;
+            return shortValue(value, sheetName, row, col, options);
 
         } else if (fieldType == Date.class) {
-            o = dateValue(value, sheetName, row, col, options);
+            return dateValue(value, sheetName, row, col, options);
 
         } else if (fieldType == LocalDate.class) {
-            o = localDateValue(value, sheetName, row, col, options);
+            return localDateValue(value, sheetName, row, col, options);
 
         } else if (fieldType == LocalDateTime.class) {
-            o = localDateTimeValue(value, sheetName, row, col, options);
+            return localDateTimeValue(value, sheetName, row, col, options);
 
         } else if (fieldType.isEnum()) {
-            o = enumValue(value, sheetName, row, col, fieldType);
+            return enumValue(value, sheetName, row, col, fieldType);
+
+        } else if (fieldType == List.class || fieldType == Collection.class) {
+            return castListValue(value, sheetName, row, col, field, options);
+
+        } else if (fieldType == Set.class) {
+            return castSetValue(value, sheetName, row, col, field, options);
 
         } else if (value.isEmpty()) {
-            o = options.preferNullOverDefault() ? null : value;
+            return options.preferNullOverDefault() ? null : value;
 
         } else {
-            o = value;
+            return value;
 
         }
-        return o;
     }
 
     @Override
@@ -337,7 +354,57 @@ public final class DefaultCasting implements Casting {
         if (errorLoggingEnabled) {
             return Collections.unmodifiableList(errors);
         } else {
-            throw new IllegalStateException("logging not enabled");
+            throw new PoijiException("logging not enabled");
+        }
+    }
+
+    private Object castListValue(String value, String sheetName, int row, int col, Field field, PoijiOptions options) {
+        if (value.isEmpty()) {
+            return options.preferNullOverDefault() ? null : emptyList();
+        }
+        final ParameterizedType genericType = (ParameterizedType) field.getGenericType();
+        final Type fieldType = genericType.getActualTypeArguments()[0];
+        final String[] valueList = value.split(options.getListDelimiter());
+
+        if (fieldType == Integer.class) {
+            return Stream.of(valueList).map(rv -> primitiveIntegerValue(rv, sheetName, row, col)).collect(toList());
+        } else if (fieldType == BigDecimal.class) {
+            return Stream.of(valueList).map(rv -> bigDecimalValue(rv, sheetName, row, col, options)).collect(toList());
+        } else if (fieldType == Long.class) {
+            return Stream.of(valueList).map(rv -> longValue(rv, sheetName, row, col, options)).collect(toList());
+        } else if (fieldType == Double.class) {
+            return Stream.of(valueList).map(rv -> doubleValue(rv, sheetName, row, col, options)).collect(toList());
+        } else if (fieldType == Boolean.class) {
+            return Stream.of(valueList).map(rv -> booleanValue(rv, sheetName, row, col, options)).collect(toList());
+        } else if (fieldType == Float.class) {
+            return Stream.of(valueList).map(rv -> floatValue(rv, sheetName, row, col, options)).collect(toList());
+        } else {
+            return Arrays.asList(valueList);
+        }
+    }
+
+    private Object castSetValue(String value, String sheetName, int row, int col, Field field, PoijiOptions options) {
+        if (value.isEmpty()) {
+            return options.preferNullOverDefault() ? null : emptySet();
+        }
+        final ParameterizedType genericType = (ParameterizedType) field.getGenericType();
+        final Type fieldType = genericType.getActualTypeArguments()[0];
+        final String[] valueList = value.split(options.getListDelimiter());
+
+        if (fieldType == Integer.class) {
+            return Stream.of(valueList).map(rv -> primitiveIntegerValue(rv, sheetName, row, col)).collect(toSet());
+        } else if (fieldType == BigDecimal.class) {
+            return Stream.of(valueList).map(rv -> bigDecimalValue(rv, sheetName, row, col, options)).collect(toSet());
+        } else if (fieldType == Long.class) {
+            return Stream.of(valueList).map(rv -> longValue(rv, sheetName, row, col, options)).collect(toSet());
+        } else if (fieldType == Double.class) {
+            return Stream.of(valueList).map(rv -> doubleValue(rv, sheetName, row, col, options)).collect(toSet());
+        } else if (fieldType == Boolean.class) {
+            return Stream.of(valueList).map(rv -> booleanValue(rv, sheetName, row, col, options)).collect(toSet());
+        } else if (fieldType == Float.class) {
+            return Stream.of(valueList).map(rv -> floatValue(rv, sheetName, row, col, options)).collect(toSet());
+        } else {
+            return new HashSet<>(Arrays.asList(valueList));
         }
     }
 

@@ -47,6 +47,16 @@ public final class PoijiOptions {
     private String csvDelimiter;
     private boolean transposed;
     private String charset;
+    private String listDelimiter;
+
+    public String getListDelimiter() {
+        return listDelimiter;
+    }
+
+    public PoijiOptions setListDelimiter(final String listDelimiter) {
+        this.listDelimiter = listDelimiter;
+        return this;
+    }
 
     public String getCharset() {
         return charset;
@@ -329,6 +339,7 @@ public final class PoijiOptions {
         private boolean transposed;
         private String charset = "UTF-8";
         private String csvDelimiter = ",";
+        private String listDelimiter = ",";
 
         private PoijiOptionsBuilder() {
         }
@@ -474,6 +485,7 @@ public final class PoijiOptions {
                 .setPoijiNumberFormat(numberFormat)
                 .setCaseInsensitive(caseInsensitive)
                 .setCsvDelimiter(csvDelimiter)
+                .setListDelimiter(listDelimiter)
                 .disableXLSXNumberCellFormat(disabledXLSXNumberCellFormat)
                 .setTransposed(transposed)
                 .setCharset(charset)
@@ -696,6 +708,17 @@ public final class PoijiOptions {
          */
         public PoijiOptionsBuilder poijiNumberFormat(final PoijiNumberFormat numberFormat) {
             this.numberFormat = numberFormat;
+            return this;
+        }
+
+        /**
+         * Use different delimiter to split the list of items of a cell
+         *
+         * @param delimiter by default delimiter is ','
+         * @return this
+         */
+        public PoijiOptionsBuilder addListDelimiter(String delimiter) {
+            this.listDelimiter = delimiter;
             return this;
         }
     }

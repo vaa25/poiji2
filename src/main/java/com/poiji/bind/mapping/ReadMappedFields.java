@@ -243,7 +243,7 @@ public class ReadMappedFields {
         } else if (orderedFields.containsKey(column)) {
             final Field field = orderedFields.get(column);
             final Casting casting = options.getCasting();
-            final Object o = casting.castValue(field.getType(), content, row, column, options);
+            final Object o = casting.castValue(field, content, row, column, options);
             final Exception exception = casting.getException();
             if (exception != null && !excelParseException.isEmpty()){
                 setExcelError(column, content, instance, field, exception);
