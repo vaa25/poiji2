@@ -1,0 +1,4 @@
+    organisation id    ,CuSTOmer extERnaL Id      ,    Organisation External ID,Organisation Name,    Region    
+,,,,
+CrEaTe,customerOrgExt,createOrgExt,createOrg,EMEA
+8d9e6430-8626-4556-8004-079085d2df2d,customerOrgExt,updateOrgExt,updateOrg,NA

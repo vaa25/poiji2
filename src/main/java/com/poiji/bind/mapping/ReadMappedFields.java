@@ -27,16 +27,16 @@ import static java.util.Collections.singletonList;
 
 public class ReadMappedFields {
 
-    private final Class<?> entity;
-    private final Map<Integer, Field> orderedFields;
+    protected final Class<?> entity;
+    protected final Map<Integer, Field> orderedFields;
     private final Map<String, Field> namedFields;
     private final List<Field> unknownFields;
-    private final PoijiOptions options;
-    private final Map<Integer, String> unknownColumns;
+    protected final PoijiOptions options;
+    protected final Map<Integer, String> unknownColumns;
     private final Map<Field, ReadMappedFields> rangeFields;
     private final List<Field> excelRow;
     private final List<Field> excelParseException;
-    private ReadMappedFields superClassFields;
+    protected ReadMappedFields superClassFields;
     private final Set<String> columnNames;
 
     public ReadMappedFields(final Class<?> entity, final PoijiOptions options) {
@@ -67,6 +67,8 @@ public class ReadMappedFields {
         parseExcelError(withoutExcelRow);
         return this;
     }
+
+
 
     public void validateMandatoryNameColumns(){
         AnnotationUtil.validateMandatoryNameColumns(options, entity, columnNames);
