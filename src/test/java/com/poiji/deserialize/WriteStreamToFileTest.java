@@ -58,7 +58,7 @@ public class WriteStreamToFileTest {
         expected.add(new WriteEntity());
         final PoijiOptions options = PoijiOptions.PoijiOptionsBuilder
             .settings()
-            .csvDelimiter(";")
+            .csvDelimiter(';')
             .datePattern("dd-MM-yyyy HH:mm:ss")
             .preferNullOverDefault(true)
             .build();

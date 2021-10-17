@@ -62,7 +62,7 @@ public class ReadCsvStreamPrefixedTest {
         expected.add(new BomReadEntity());
         final PoijiOptions options = PoijiOptions.PoijiOptionsBuilder
             .settings()
-            .csvDelimiter(",")
+            .csvDelimiter(',')
             .datePattern("dd-MM-yyyy HH:mm:ss")
             .preferNullOverDefault(true)
             .build();

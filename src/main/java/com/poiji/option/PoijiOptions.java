@@ -47,7 +47,7 @@ public final class PoijiOptions {
     private PoijiLogCellFormat poijiLogCellFormat;
     private PoijiNumberFormat numberFormat;
     private boolean disableXLSXNumberCellFormat;
-    private String csvDelimiter;
+    private char csvDelimiter;
     private boolean transposed;
     private String charset;
     private String listDelimiter;
@@ -98,11 +98,11 @@ public final class PoijiOptions {
         return this;
     }
 
-    public String getCsvDelimiter() {
+    public char getCsvDelimiter() {
         return csvDelimiter;
     }
 
-    private PoijiOptions setCsvDelimiter(final String csvDelimiter) {
+    private PoijiOptions setCsvDelimiter(final char csvDelimiter) {
         this.csvDelimiter = csvDelimiter;
         return this;
     }
@@ -361,7 +361,7 @@ public final class PoijiOptions {
         private boolean namedHeaderMandatory;
         private boolean transposed;
         private String charset = "UTF-8";
-        private String csvDelimiter = ",";
+        private char csvDelimiter = ',';
         private String listDelimiter = ",";
         private Formatting formatting = new DefaultFormatting();
 
@@ -726,7 +726,7 @@ public final class PoijiOptions {
          *
          * @param csvDelimiter fields are mandatory or not
          */
-        public PoijiOptionsBuilder csvDelimiter(String csvDelimiter) {
+        public PoijiOptionsBuilder csvDelimiter(char csvDelimiter) {
             this.csvDelimiter = csvDelimiter;
             return this;
         }

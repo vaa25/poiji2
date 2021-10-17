@@ -2,6 +2,7 @@ package com.poiji.bind.mapping;
 
 import com.poiji.option.PoijiOptions;
 import com.poiji.util.ReflectUtil;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -28,7 +29,7 @@ public final class CsvLineReader<T> {
             return null;
         } else if (isFirstLine){
             isFirstLine = false;
-            final String[] columnNames = line.split(options.getCsvDelimiter());
+            final String[] columnNames = parseLine(line);
             for (int i = 0; i < columnNames.length; i++) {
                 final String columnName = unwrap(columnNames[i]);
                 if (!columnName.isEmpty()){
@@ -39,7 +40,7 @@ public final class CsvLineReader<T> {
             readMappedFields.validateMandatoryNameColumns();
             return null;
         } else {
-            final String[] values = line.split(options.getCsvDelimiter());
+            final String[] values = parseLine(line);
             if (areValuesHaveData(values)){
                 final T instance = ReflectUtil.newInstanceOf(entity);
                 for (int column = 0; column < values.length; column++) {
@@ -56,6 +57,40 @@ public final class CsvLineReader<T> {
         }
     }
 
+    private String[] parseLine(final String line) {
+        final char[] chars = line.toCharArray();
+        State state = State.BEGIN;
+        final ArrayList<String> words = new ArrayList<>();
+        StringBuilder word = new StringBuilder();
+        final char delimiter = options.getCsvDelimiter();
+        for (char aChar : chars) {
+            if (state == State.BEGIN && word.length() == 0 && aChar == '\"') {
+                state = State.MIDDLE;
+            } else if ((state == State.MIDDLE || (state == State.BEGIN && word.length() > 0)) && aChar == '\"') {
+                state = State.QUOTE;
+            } else if (state == State.QUOTE && aChar == '\"') {
+                state = State.BEGIN;
+                word.append('\"');
+            } else if ((state == State.QUOTE || state == State.BEGIN) && aChar == delimiter) {
+                words.add(word.toString());
+                word = new StringBuilder();
+                state = State.BEGIN;
+            } else {
+                word.append(aChar);
+            }
+        }
+        if (word.length() > 0) {
+            words.add(word.toString());
+        }
+        final String[] result = new String[words.size()];
+        words.toArray(result);
+        return result;
+    }
+
+    private enum State {
+        BEGIN, MIDDLE, QUOTE
+    }
+
     private boolean areValuesHaveData(final String[] values) {
         for (final String value : values) {
             if (!value.isEmpty()){
@@ -67,7 +102,7 @@ public final class CsvLineReader<T> {
 
     private String unwrap(final String value) {
         if (!value.isEmpty() && value.charAt(0) == '"' && value.charAt(value.length() - 1) == '"'){
-            return value.substring(1, value.length() -1);
+            return value.substring(1, value.length() - 1);
         } else {
             return value;
         }

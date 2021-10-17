@@ -51,10 +51,10 @@ public final class CsvFileSaver implements FileSaver {
             final String[] headers = new String[maxColumn];
             for (int i = 0; i < fields.length; i++) {
                 final Field field = fields[i];
-                headers[i] = names.getOrDefault(field, "");
+                headers[i] = wrapRules(names.getOrDefault(field, ""));
             }
             unknownOrders.forEach((unknownName, unknownColumn) -> headers[unknownColumn] = unknownName);
-            csvWriter.writeHeader(String.join(options.getCsvDelimiter(), headers));
+            csvWriter.writeHeader(String.join(String.valueOf(options.getCsvDelimiter()), headers));
             data.forEach(entity -> {
                 final String[] row = new String[maxColumn];
                 for (int i = 0; i < fields.length; i++) {
@@ -63,13 +63,9 @@ public final class CsvFileSaver implements FileSaver {
                         try {
                             if (unknownOrders.containsValue(i)){
                                 final Map<String, String> unknownCell = (Map<String, String>) field.get(entity);
-                                if (unknownCell.containsKey(headers[i])){
-                                    row[i] = unknownCell.get(headers[i]);
-                                } else {
-                                    row[i] = "";
-                                }
+                                row[i] = wrapRules(unknownCell.getOrDefault(headers[i], ""));
                             } else {
-                                row[i] = toString(field.get(entity));
+                                row[i] = wrapRules(toString(field.get(entity)));
                             }
                         } catch (IllegalAccessException e) {
                             e.printStackTrace();
@@ -78,11 +74,21 @@ public final class CsvFileSaver implements FileSaver {
                         row[i] = "";
                     }
                 }
-                csvWriter.writeRow(String.join(options.getCsvDelimiter(), row));
+                csvWriter.writeRow(String.join(String.valueOf(options.getCsvDelimiter()), row));
             });
         } finally {
             csvWriter.close();
         }
+    }
+
+    private String wrapRules(String value){
+        if (value.contains("\"")){
+            value = value.replace("\"", "\"\"");
+        }
+        if (value.contains(String.valueOf(options.getCsvDelimiter())) || value.contains("\"")){
+            value = "\"" + value + "\"";
+        }
+        return value;
     }
 
     private String toString(final Object o) {

@@ -219,7 +219,7 @@ public class ReadMappedFields {
         if (superClassFields != null) {
             superClassFields.setCellInInstance(row, column, content, instance);
         }
-        if (!unknownFields.isEmpty() && unknownColumns.containsKey(column)) {
+        if (!unknownFields.isEmpty() && unknownColumns.containsKey(column) && !content.isEmpty()) {
             for (final Field unknownField : unknownFields) {
                 try {
                     final Object unknownInstance = unknownField.get(instance);
