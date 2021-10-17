@@ -4,6 +4,7 @@ import com.poiji.bind.PoijiFile;
 import com.poiji.bind.PoijiInputStream;
 import com.poiji.bind.Unmarshaller;
 import com.poiji.option.PoijiOptions;
+import org.apache.poi.ss.usermodel.Sheet;
 
 /**
  * Created by hakan on 17/01/2017.
@@ -28,5 +29,9 @@ public final class UnmarshallerHelper {
 
     public static Unmarshaller csvInstance(PoijiInputStream<?> poijiInputStream, PoijiOptions options) {
         return new CsvUnmarshallerStream(poijiInputStream, options);
+    }
+
+    public static Unmarshaller SheetInstance(Sheet sheet, PoijiOptions options) {
+        return new SheetUnmarshaller(sheet, options);
     }
 }

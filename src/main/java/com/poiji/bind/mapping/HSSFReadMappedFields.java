@@ -6,6 +6,7 @@ import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
+import org.apache.poi.ss.formula.BaseFormulaEvaluator;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
@@ -16,9 +17,13 @@ public final class HSSFReadMappedFields extends ReadMappedFields{
 
     private final DataFormatter dataFormatter;
     private final Collection<Short> disabledCellFormat;
+    private final BaseFormulaEvaluator baseFormulaEvaluator;
 
-    public HSSFReadMappedFields(final Class<?> entity, final PoijiOptions options) {
+    public HSSFReadMappedFields(
+        final Class<?> entity, final BaseFormulaEvaluator baseFormulaEvaluator, final PoijiOptions options
+    ) {
         super(entity, options);
+        this.baseFormulaEvaluator = baseFormulaEvaluator;
         dataFormatter = new DataFormatter();
         disabledCellFormat = new HashSet<>();
     }
@@ -27,7 +32,7 @@ public final class HSSFReadMappedFields extends ReadMappedFields{
     public HSSFReadMappedFields parseEntity(){
         final Class<?> superclass = entity.getSuperclass();
         if (!superclass.isInterface() && superclass != Object.class) {
-            superClassFields = new HSSFReadMappedFields(superclass, options).parseEntity();
+            superClassFields = new HSSFReadMappedFields(superclass, baseFormulaEvaluator, options).parseEntity();
         }
         super.parseEntity();
         return this;
@@ -66,7 +71,8 @@ public final class HSSFReadMappedFields extends ReadMappedFields{
             if (disabledCellFormat.contains(columnOrder)){
                 cell.setCellStyle(null);
             }
-            setCellInInstance(row.getRowNum(), columnOrder, dataFormatter.formatCellValue(cell), instance);
+            final String cellValue = dataFormatter.formatCellValue(cell, baseFormulaEvaluator);
+            setCellInInstance(row.getRowNum(), columnOrder, cellValue, instance);
         }
     }
 

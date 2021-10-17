@@ -8,6 +8,9 @@ import com.poiji.util.ReflectUtil;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.function.Consumer;
+import org.apache.poi.hssf.usermodel.HSSFFormulaEvaluator;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.formula.BaseFormulaEvaluator;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
@@ -23,6 +26,7 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
     protected final PoijiOptions options;
     private final int limit;
     private int internalCount;
+    protected BaseFormulaEvaluator baseFormulaEvaluator;
 
     HSSFUnmarshaller(final PoijiOptions options) {
         this.options = options;
@@ -31,32 +35,36 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
 
     @Override
     public <T> void unmarshal(Class<T> type, Consumer<? super T> consumer) {
-        try (final Workbook workbook = workbook()) {
+        try (final HSSFWorkbook workbook = (HSSFWorkbook) workbook()) {
             if (options.getTransposed()){
                 TransposeUtil.transpose(workbook);
             }
             final Optional<String> maybeSheetName = SheetNameExtractor.getSheetName(type, options);
-
+            baseFormulaEvaluator = HSSFFormulaEvaluator.create(workbook, null, null);
             final Sheet sheet = this.getSheetToProcess(workbook, options, maybeSheetName.orElse(null));
 
-            final int skip = options.skip();
-            final int maxPhysicalNumberOfRows = sheet.getPhysicalNumberOfRows() + 1 - skip;
-
-            final HSSFReadMappedFields readMappedFields = loadColumnTitles(sheet, maxPhysicalNumberOfRows, type);
-
-            for (final Row currentRow : sheet) {
-                if (!skip(currentRow, skip) && !isRowEmpty(currentRow)) {
-                    internalCount += 1;
-
-                    if (limit != 0 && internalCount > limit) {
-                        return;
-                    }
-
-                    consumer.accept(readMappedFields.parseRow(currentRow, ReflectUtil.newInstanceOf(type)));
-                }
-            }
+            processRowsToObjects(sheet, type, consumer);
         } catch (final IOException e) {
             throw new PoijiException("Problem occurred while closing HSSFWorkbook", e);
+        }
+    }
+
+    protected  <T> void processRowsToObjects(final Sheet sheet, final Class<T> type, final Consumer<? super T> consumer) {
+        final int skip = options.skip();
+        final int maxPhysicalNumberOfRows = sheet.getPhysicalNumberOfRows() + 1 - skip;
+
+        final HSSFReadMappedFields readMappedFields = loadColumnTitles(sheet, maxPhysicalNumberOfRows, type);
+
+        for (final Row currentRow : sheet) {
+            if (!skip(currentRow, skip) && !isRowEmpty(currentRow)) {
+                internalCount += 1;
+
+                if (limit != 0 && internalCount > limit) {
+                    return;
+                }
+
+                consumer.accept(readMappedFields.parseRow(currentRow, ReflectUtil.newInstanceOf(type)));
+            }
         }
     }
 
@@ -90,7 +98,7 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
     }
 
     private HSSFReadMappedFields loadColumnTitles(Sheet sheet, int maxPhysicalNumberOfRows, final Class<?> type) {
-        final HSSFReadMappedFields readMappedFields = new HSSFReadMappedFields(type, options).parseEntity();
+        final HSSFReadMappedFields readMappedFields = new HSSFReadMappedFields(type, baseFormulaEvaluator,  options).parseEntity();
         if (maxPhysicalNumberOfRows > 0) {
             readMappedFields.parseColumnNames(sheet.getRow(options.getHeaderStart()));
         }

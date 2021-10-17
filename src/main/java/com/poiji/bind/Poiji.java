@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
+import org.apache.poi.ss.usermodel.Sheet;
 
 import static com.poiji.util.PoijiConstants.CSV_EXTENSION;
 import static com.poiji.util.PoijiConstants.XLSX_EXTENSION;
@@ -317,6 +318,61 @@ public final class Poiji {
         Objects.requireNonNull(excelType);
 
         final Unmarshaller unmarshaller = deserializer(inputStream, excelType, options);
+        unmarshaller.unmarshal(type, consumer);
+    }
+
+    /**
+     * converts excel rows into a list of objects
+     *
+     * @param sheet   excel sheet its workbook must be either  an instance of {@code HSSFWorkbook} or {@code XSSFWorkbook}.
+     * @param type    type of the root object.
+     * @param <T>     type of the root object.
+     * @param options specifies to change the default behaviour of the poiji.
+     * @throws PoijiException if an internal exception occurs during the mapping process.
+     * @see Poiji#fromExcel(Sheet, Class, PoijiOptions, Consumer)
+     * @see Poiji#fromExcel(Sheet, Class)
+     */
+    public static <T> List<T> fromExcel(final Sheet sheet, final Class<T> type, final PoijiOptions options) {
+        Objects.requireNonNull(sheet);
+        final ArrayList<T> list = new ArrayList<>();
+        fromExcel(sheet, type, options, list::add);
+        return list;
+    }
+
+    /**
+     * converts excel rows into a list of objects
+     *
+     * @param sheet excel sheet its workbook must be either an instance of {@code HSSFWorkbook} or {@code XSSFWorkbook}.
+     * @param type  type of the root object.
+     * @param <T>   type of the root object.
+     * @throws PoijiException if an internal exception occurs during the mapping process.
+     * @see Poiji#fromExcel(Sheet, Class, PoijiOptions)
+     * @see Poiji#fromExcel(Sheet, Class, PoijiOptions, Consumer)
+     */
+    public static <T> List<T> fromExcel(final Sheet sheet, final Class<T> type) {
+        Objects.requireNonNull(sheet);
+        final ArrayList<T> list = new ArrayList<>();
+        fromExcel(sheet, type, PoijiOptionsBuilder.settings().build(), list::add);
+        return list;
+    }
+
+    /**
+     * converts excel rows into a list of objects
+     *
+     * @param sheet    excel sheet its workbook must be either an instance of {@code HSSFWorkbook} or {@code XSSFWorkbook}.
+     * @param type     type of the root object.
+     * @param <T>      type of the root object.
+     * @param options  specifies to change the default behaviour of the poiji.
+     * @param consumer represents an operation that accepts the type argument.
+     * @throws PoijiException if an internal exception occurs during the mapping process.
+     * @see Poiji#fromExcel(Sheet, Class, PoijiOptions)
+     * @see Poiji#fromExcel(Sheet, Class)
+     */
+    public static <T> void fromExcel(
+        final Sheet sheet, final Class<T> type, final PoijiOptions options, final Consumer<? super T> consumer
+    ) {
+        Objects.requireNonNull(sheet);
+        final Unmarshaller unmarshaller = UnmarshallerHelper.SheetInstance(sheet, options);
         unmarshaller.unmarshal(type, consumer);
     }
 
