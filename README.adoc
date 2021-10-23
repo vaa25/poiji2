@@ -1,9 +1,9 @@
 = Poiji2
 
 This is an advanced fork of https://github.com/ozlerhakan/poiji. +
-Many thanks to ozlerhakan for ignoring my pull requests.
+Many thanks to ozlerhakan for inspiration.
 
-Apache POI library required. Tested with dependency 'org.apache.poi:poi-ooxml:4.1.2'. 
+Apache POI library required as dependency. Tested with dependency 'org.apache.poi:poi-ooxml:4.1.2'. 
 
 In your Maven/Gradle project, first add the corresponding dependency:
 
