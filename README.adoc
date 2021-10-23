@@ -1,0 +1,42 @@
+= Poiji2
+
+This is an advanced fork of https://github.com/ozlerhakan/poiji. +
+Many thanks to ozlerhakan for ignoring my pull requests.
+
+Apache POI library required. Tested with dependency 'org.apache.poi:poi-ooxml:4.1.2'. 
+
+In your Maven/Gradle project, first add the corresponding dependency:
+
+.maven
+[source,xml]
+----
+<dependency>
+    <groupId>io.github.vaa25</groupId>
+    <artifactId>poiji2</artifactId>
+    <version>1.0.0</version>
+</dependency>
+
+----
+
+.gradle
+[source,groovy]
+----
+dependencies {
+    compile 'io.github.vaa25:poiji2:1.0.0'
+}
+----
+
+You can find feature descriptions in https://github.com/ozlerhakan/poiji README
+
+Supported features: 1 - 17.
+
+Also:
+
+- Poiji2 is thread-safe.
+- Poiji2 reads 30% faster then Poiji (see ConcurrentTest: synchronized read for Poiji vs synchronized optimized read for Poiji2).
+- Poiji2 can write (use Poiji.toExcel()).
+- Poiji2 can csv (use PoijiExcelType.CSV).
+- Poiji2 can transpose sheet (use PoijiOptions.transposed).
+- Poiji2 has mandatory column validation (use @ExcelCellName.mandatory).
+- Poiji2 can collect parse exceptions in Entity object (use @ExcelParseExceptions on Map<String, ExcelParseException>.
+
