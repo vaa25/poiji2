@@ -138,9 +138,9 @@ public class DefaultCasting implements Casting {
         }
     }
 
-    private double primitiveDoubleValue(String value, String sheetName, int row, int col) {
+    private double primitiveDoubleValue(String value, String sheetName, int row, int col, PoijiOptions options) {
         try {
-            return Parsers.numbers().parse(value).doubleValue();
+            return Parsers.numbers(options.getLocale()).parse(value).doubleValue();
         } catch (NumberFormatException nfe) {
             return onError(value, sheetName, row, col, nfe, 0d);
         }
@@ -148,15 +148,15 @@ public class DefaultCasting implements Casting {
 
     private Double doubleValue(String value, String sheetName, int row, int col, PoijiOptions options) {
         try {
-            return Parsers.numbers().parse(value).doubleValue();
+            return Parsers.numbers(options.getLocale()).parse(value).doubleValue();
         } catch (NumberFormatException nfe) {
             return onError(value, sheetName, row, col, nfe, options.preferNullOverDefault() ? null : 0d);
         }
     }
 
-    private float primitiveFloatValue(String value, String sheetName, int row, int col) {
+    private float primitiveFloatValue(String value, String sheetName, int row, int col, PoijiOptions options) {
         try {
-            return Parsers.numbers().parse(value).floatValue();
+            return Parsers.numbers(options.getLocale()).parse(value).floatValue();
         } catch (NumberFormatException nfe) {
             return onError(value, sheetName, row, col, nfe, 0f);
         }
@@ -164,7 +164,7 @@ public class DefaultCasting implements Casting {
 
     private Float floatValue(String value, String sheetName, int row, int col, PoijiOptions options) {
         try {
-            return Parsers.numbers().parse(value).floatValue();
+            return Parsers.numbers(options.getLocale()).parse(value).floatValue();
         } catch (NumberFormatException nfe) {
             return onError(value, sheetName, row, col, nfe, options.preferNullOverDefault() ? null : 0f);
         }
@@ -273,13 +273,13 @@ public class DefaultCasting implements Casting {
             return longValue(trimDecimal(value), sheetName, row, col, options);
 
         } else if (fieldType == double.class) {
-            return primitiveDoubleValue(value, sheetName, row, col);
+            return primitiveDoubleValue(value, sheetName, row, col, options);
 
         } else if (fieldType == Double.class) {
             return doubleValue(value, sheetName, row, col, options);
 
         } else if (fieldType == float.class) {
-            return primitiveFloatValue(value, sheetName, row, col);
+            return primitiveFloatValue(value, sheetName, row, col, options);
 
         } else if (fieldType == Float.class) {
             return floatValue(value, sheetName, row, col, options);
