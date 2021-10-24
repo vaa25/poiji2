@@ -70,8 +70,7 @@ def customizePom(pom) {
         }
 
         root.children().last() + {
-//            resolveStrategy = DELEGATE_FIRST
-            resolveStrategy = 1
+            resolveStrategy = Closure.DELEGATE_FIRST
 
             description 'Perfect annotation based library to read and write excel files'
             name 'Poiji2'
