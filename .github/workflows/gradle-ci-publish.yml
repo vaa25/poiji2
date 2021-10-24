@@ -20,7 +20,7 @@ jobs:
           echo '${{secrets.GPG_KEY_CONTENTS}}' | base64 -d > publish_key.gpg
           gpg --quiet --batch --yes --decrypt --passphrase="${{secrets.SECRET_PASSPHRASE}}" \
           --output secret.gpg publish_key.gpg
-          echo "::set-env name=RELEASE_VERSION::${GITHUB_REF:11}"
+          echo "RELEASE_VERSION=${GITHUB_REF:11}" >> $GITHUB_ENV
 
       - name: Publish with Gradle
         uses: eskatos/gradle-command-action@v1
