@@ -58,9 +58,9 @@ public class DefaultCasting implements Casting {
         }
     }
 
-    private Boolean primitiveBooleanValue(String value, String sheetName, int row, int col) {
+    private boolean primitiveBooleanValue(String value, String sheetName, int row, int col) {
         try {
-            return Parsers.booleans().parse(value);
+            return !value.isEmpty() && Parsers.booleans().parse(value);
         } catch (BooleanParser.BooleanParseException bpe) {
             return onError(value, sheetName, row, col, bpe, false);
         }
@@ -68,6 +68,9 @@ public class DefaultCasting implements Casting {
 
     private Boolean booleanValue(String value, String sheetName, int row, int col, PoijiOptions options) {
         try {
+            if (value.isEmpty()) {
+                return options.preferNullOverDefault() ? null : false;
+            }
             return Parsers.booleans().parse(value);
         } catch (BooleanParser.BooleanParseException bpe) {
             return onError(value, sheetName, row, col, bpe, options.preferNullOverDefault() ? null : false);
@@ -76,9 +79,12 @@ public class DefaultCasting implements Casting {
 
     private Byte byteValue(String value, String sheetName, int row, int col, PoijiOptions options) {
         try {
-            return value.isEmpty() ? options.preferNullOverDefault() ? null : (byte) 0 : Byte.valueOf(trimDecimal(value));
+            if (value.isEmpty()) {
+                return options.preferNullOverDefault() ? null : (byte) 0;
+            }
+            return Byte.valueOf(trimDecimal(value));
         } catch (Exception e) {
-            return onError(value, sheetName, row, col, e, options.preferNullOverDefault() ? null : (byte)0);
+            return onError(value, sheetName, row, col, e, options.preferNullOverDefault() ? null : (byte) 0);
         }
     }
 
@@ -92,9 +98,12 @@ public class DefaultCasting implements Casting {
 
     private Short shortValue(String value, String sheetName, int row, int col, PoijiOptions options) {
         try {
-            return value.isEmpty() ? options.preferNullOverDefault() ? null : (short) 0 : Short.valueOf(trimDecimal(value));
+            if (value.isEmpty()) {
+                return options.preferNullOverDefault() ? null : (short) 0;
+            }
+            return Short.valueOf(trimDecimal(value));
         } catch (Exception e) {
-            return onError(value, sheetName, row, col, e, options.preferNullOverDefault() ? null : (short)0);
+            return onError(value, sheetName, row, col, e, options.preferNullOverDefault() ? null : (short) 0);
         }
     }
 
@@ -108,7 +117,7 @@ public class DefaultCasting implements Casting {
 
     private int primitiveIntegerValue(String value, String sheetName, int row, int col) {
         try {
-            return Parsers.integers().parse(value).intValue();
+            return value.isEmpty() ? 0 : Parsers.integers().parse(value).intValue();
         } catch (NumberFormatException nfe) {
             return onError(value, sheetName, row, col, nfe, 0);
         }
@@ -116,6 +125,9 @@ public class DefaultCasting implements Casting {
 
     private Integer integerValue(String value, String sheetName, int row, int col, PoijiOptions options) {
         try {
+            if (value.isEmpty()) {
+                return options.preferNullOverDefault() ? null : 0;
+            }
             return Parsers.integers().parse(value).intValue();
         } catch (NumberFormatException nfe) {
             return onError(value, sheetName, row, col, nfe, options.preferNullOverDefault() ? null : 0);
@@ -124,7 +136,7 @@ public class DefaultCasting implements Casting {
 
     private long primitiveLongValue(String value, String sheetName, int row, int col) {
         try {
-            return Parsers.longs().parse(value).longValue();
+            return value.isEmpty() ? 0 : Parsers.longs().parse(value).longValue();
         } catch (NumberFormatException nfe) {
             return onError(value, sheetName, row, col, nfe, 0L);
         }
@@ -132,6 +144,9 @@ public class DefaultCasting implements Casting {
 
     private Long longValue(String value, String sheetName, int row, int col, PoijiOptions options) {
         try {
+            if (value.isEmpty()) {
+                return options.preferNullOverDefault() ? null : 0L;
+            }
             return Parsers.longs().parse(value).longValue();
         } catch (NumberFormatException nfe) {
             return onError(value, sheetName, row, col, nfe, options.preferNullOverDefault() ? null : 0L);
@@ -140,7 +155,7 @@ public class DefaultCasting implements Casting {
 
     private double primitiveDoubleValue(String value, String sheetName, int row, int col, PoijiOptions options) {
         try {
-            return Parsers.numbers(options.getLocale()).parse(value).doubleValue();
+            return value.isEmpty() ? 0d : Parsers.numbers(options.getLocale()).parse(value).doubleValue();
         } catch (NumberFormatException nfe) {
             return onError(value, sheetName, row, col, nfe, 0d);
         }
@@ -148,6 +163,9 @@ public class DefaultCasting implements Casting {
 
     private Double doubleValue(String value, String sheetName, int row, int col, PoijiOptions options) {
         try {
+            if (value.isEmpty()) {
+                return options.preferNullOverDefault() ? null : 0d;
+            }
             return Parsers.numbers(options.getLocale()).parse(value).doubleValue();
         } catch (NumberFormatException nfe) {
             return onError(value, sheetName, row, col, nfe, options.preferNullOverDefault() ? null : 0d);
@@ -156,7 +174,7 @@ public class DefaultCasting implements Casting {
 
     private float primitiveFloatValue(String value, String sheetName, int row, int col, PoijiOptions options) {
         try {
-            return Parsers.numbers(options.getLocale()).parse(value).floatValue();
+            return value.isEmpty() ? 0f : Parsers.numbers(options.getLocale()).parse(value).floatValue();
         } catch (NumberFormatException nfe) {
             return onError(value, sheetName, row, col, nfe, 0f);
         }
@@ -164,6 +182,9 @@ public class DefaultCasting implements Casting {
 
     private Float floatValue(String value, String sheetName, int row, int col, PoijiOptions options) {
         try {
+            if (value.isEmpty()) {
+                return options.preferNullOverDefault() ? null : 0f;
+            }
             return Parsers.numbers(options.getLocale()).parse(value).floatValue();
         } catch (NumberFormatException nfe) {
             return onError(value, sheetName, row, col, nfe, options.preferNullOverDefault() ? null : 0f);
@@ -172,6 +193,9 @@ public class DefaultCasting implements Casting {
 
     private BigDecimal bigDecimalValue(String value, String sheetName, int row, int col, PoijiOptions options) {
         try {
+            if (value.isEmpty()) {
+                return options.preferNullOverDefault() ? null : BigDecimal.ZERO;
+            }
             return Parsers.bigDecimals().parse(value);
         } catch (NumberFormatException | IllegalStateException e) {
             return onError(value, sheetName, row, col, e, options.preferNullOverDefault() ? null : BigDecimal.ZERO);
