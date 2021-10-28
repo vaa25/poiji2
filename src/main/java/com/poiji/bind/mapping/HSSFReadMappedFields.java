@@ -2,6 +2,7 @@ package com.poiji.bind.mapping;
 
 import com.poiji.annotation.DisableCellFormatXLS;
 import com.poiji.option.PoijiOptions;
+import com.poiji.util.ReflectUtil;
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.HashSet;
@@ -60,7 +61,8 @@ public final class HSSFReadMappedFields extends ReadMappedFields{
         return result;
     }
 
-    public <T> T parseRow(final Row row, final T instance) {
+    public <T> T parseRow(final Row row) {
+        final T instance = ReflectUtil.newInstanceOf((Class<T>) entity);
         setRowInInstance(row, instance);
         return instance;
     }

@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.junit.Test;
 
+import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 
@@ -30,10 +31,17 @@ public class ReadCsvRulesTest {
             .csvDelimiter(',')
             .preferNullOverDefault(true)
             .build();
-        final FileInputStream fileInputStream = new FileInputStream("src/test/resources/readRules.csv");
-        final List<CsvRules> read = Poiji.fromExcel(fileInputStream, PoijiExcelType.CSV, CsvRules.class, options);
+
+        final List<CsvRules> read = Poiji.fromExcel(getInputStream(), PoijiExcelType.CSV, CsvRules.class, options);
         assertThat(read, equalTo(expected));
 
+        final List<CsvRules> stream = Poiji.fromExcelToStream(getInputStream(), PoijiExcelType.CSV, CsvRules.class, options).collect(toList());
+        assertThat(stream, equalTo(expected));
+
+    }
+
+    private FileInputStream getInputStream() throws FileNotFoundException {
+        return new FileInputStream("src/test/resources/readRules.csv");
     }
 
 }

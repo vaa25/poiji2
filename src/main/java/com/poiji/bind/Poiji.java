@@ -193,6 +193,24 @@ public final class Poiji {
     }
 
     /**
+     * converts excel rows into a stream of objects
+     *
+     * @param file excel file ending with .xls or .xlsx.
+     * @param type type of the root object.
+     * @param <T> type of the root object.
+     * @throws PoijiException if an internal exception occurs during the mapping
+     * process.
+     * @throws InvalidExcelFileExtension if the specified excel file extension
+     * is invalid.
+     * @throws IllegalCastException if this Field object is enforcing Java language access control and the underlying field is either inaccessible or final.
+     *
+     * @see Poiji#fromExcel(File, Class, PoijiOptions)
+     */
+    public static <T> Stream<T> fromExcelToStream(final File file, final Class<T> type) {
+        return fromExcelToStream(file, type, PoijiOptionsBuilder.settings().build());
+    }
+
+    /**
      * converts excel rows into a list of objects
      *
      * @param inputStream excel file stream
@@ -236,6 +254,22 @@ public final class Poiji {
     }
 
     /**
+     * converts excel rows into a stream of objects
+     *
+     * @param inputStream excel file stream
+     * @param excelType type of the excel file, xls or xlsx
+     * @param type type of the root object.
+     * @param <T> type of the root object.
+     * @throws PoijiException if an internal exception occurs during the mapping process.
+     * @throws InvalidExcelFileExtension if the specified excel file extension is invalid.
+     * @throws IllegalCastException if this Field object is enforcing Java language access control and the underlying field is either inaccessible or final.
+     * @see Poiji#fromExcel(File, Class, PoijiOptions)
+     */
+    public static <T> Stream<T> fromExcelToStream(final InputStream inputStream, PoijiExcelType excelType, final Class<T> type) {
+        return fromExcelToStream(inputStream, excelType, type, PoijiOptionsBuilder.settings().build());
+    }
+
+    /**
      * converts excel rows into a list of objects
      *
      * @param file    excel file ending with .xls or .xlsx.
@@ -272,6 +306,23 @@ public final class Poiji {
     ) {
         final Unmarshaller unmarshaller = deserializer(file, options);
         unmarshaller.unmarshal(type, consumer);
+    }
+
+    /**
+     * converts excel rows into a stream of objects
+     *
+     * @param file excel file ending with .xls or .xlsx.
+     * @param type type of the root object.
+     * @param <T> type of the root object.
+     * @param options specifies to change the default behaviour of the poiji.
+     * @throws PoijiException if an internal exception occurs during the mapping process.
+     * @throws InvalidExcelFileExtension if the specified excel file extension is invalid.
+     * @throws IllegalCastException if this Field object is enforcing Java language access control and the underlying field is either inaccessible or final.
+     * @see Poiji#fromExcel(File, Class)
+     */
+    public static <T> Stream<T> fromExcelToStream(final File file, final Class<T> type, final PoijiOptions options) {
+        final Unmarshaller unmarshaller = deserializer(file, options);
+        return unmarshaller.stream(type);
     }
 
     /**
@@ -322,6 +373,27 @@ public final class Poiji {
     }
 
     /**
+     * converts excel rows into a stream of objects
+     *
+     * @param inputStream excel file stream
+     * @param excelType type of the excel file, xls or xlsx
+     * @param type type of the root object.
+     * @param <T> type of the root object.
+     * @param options specifies to change the default behaviour of the poiji.
+     * @throws PoijiException if an internal exception occurs during the mapping process.
+     * @throws InvalidExcelFileExtension if the specified excel file extension is invalid.
+     * @throws IllegalCastException if this Field object is enforcing Java
+     * language access control and the underlying field is either inaccessible or final.
+     * @see Poiji#fromExcel(File, Class)
+     */
+    public static <T> Stream<T> fromExcelToStream(
+        final InputStream inputStream, final PoijiExcelType excelType, final Class<T> type, final PoijiOptions options
+    ) {
+        final Unmarshaller unmarshaller = deserializer(inputStream, excelType, options);
+        return unmarshaller.stream(type);
+    }
+
+    /**
      * converts excel rows into a list of objects
      *
      * @param sheet   excel sheet its workbook must be either  an instance of {@code HSSFWorkbook} or {@code XSSFWorkbook}.
@@ -357,6 +429,20 @@ public final class Poiji {
     }
 
     /**
+     * converts excel rows into a stream of objects
+     *
+     * @param sheet excel sheet its workbook must be either an instance of {@code HSSFWorkbook} or {@code XSSFWorkbook}.
+     * @param type  type of the root object.
+     * @param <T>   type of the root object.
+     * @throws PoijiException if an internal exception occurs during the mapping process.
+     * @see Poiji#fromExcel(Sheet, Class, PoijiOptions)
+     * @see Poiji#fromExcel(Sheet, Class, PoijiOptions, Consumer)
+     */
+    public static <T> Stream<T> fromExcelToStream(final Sheet sheet, final Class<T> type) {
+        return fromExcelToStream(sheet, type,  PoijiOptionsBuilder.settings().build());
+    }
+
+    /**
      * converts excel rows into a list of objects
      *
      * @param sheet    excel sheet its workbook must be either an instance of {@code HSSFWorkbook} or {@code XSSFWorkbook}.
@@ -374,6 +460,24 @@ public final class Poiji {
         Objects.requireNonNull(sheet);
         final Unmarshaller unmarshaller = UnmarshallerHelper.SheetInstance(sheet, options);
         unmarshaller.unmarshal(type, consumer);
+    }
+
+    /**
+     * converts excel rows into a stream of objects
+     *
+     * @param sheet    excel sheet its workbook must be either an instance of {@code HSSFWorkbook} or {@code XSSFWorkbook}.
+     * @param type     type of the root object.
+     * @param <T>      type of the root object.
+     * @param options  specifies to change the default behaviour of the poiji.
+     * @throws PoijiException if an internal exception occurs during the mapping process.
+     * @see Poiji#fromExcel(Sheet, Class, PoijiOptions)
+     * @see Poiji#fromExcel(Sheet, Class)
+     */
+    public static <T> Stream<T> fromExcelToStream(
+        final Sheet sheet, final Class<T> type, final PoijiOptions options
+    ) {
+        final Unmarshaller unmarshaller = UnmarshallerHelper.SheetInstance(sheet, options);
+        return unmarshaller.stream(type);
     }
 
     public static <T> void toExcel(final File file, final Class<T> clazz, final Collection<T> data) {

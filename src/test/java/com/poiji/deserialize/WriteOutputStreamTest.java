@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 
@@ -75,6 +76,10 @@ public class WriteOutputStreamTest {
         final List<WriteEntity> read = Poiji.fromExcel(new File(path), WriteEntity.class, options);
         read.forEach(writeEntity -> writeEntity.setUnknown(new HashMap<>()));
         assertThat(read.toString(), equalTo(expected.toString()));
+
+        final List<WriteEntity> stream = Poiji.fromExcelToStream(new File(path), WriteEntity.class, options).collect(toList());
+        stream.forEach(writeEntity -> writeEntity.setUnknown(new HashMap<>()));
+        assertThat(stream.toString(), equalTo(expected.toString()));
 
     }
 

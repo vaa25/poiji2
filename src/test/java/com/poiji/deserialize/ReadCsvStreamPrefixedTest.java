@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 
@@ -70,11 +71,18 @@ public class ReadCsvStreamPrefixedTest {
             .build();
 
 
-        final FileInputStream fileInputStream = new FileInputStream(path);
-        final List<BomReadEntity> read = Poiji.fromExcel(fileInputStream, PoijiExcelType.CSV, BomReadEntity.class, options);
+        final List<BomReadEntity> read = Poiji.fromExcel(getFileInputStream(), PoijiExcelType.CSV, BomReadEntity.class, options);
         read.forEach(writeEntity -> writeEntity.setUnknown(new HashMap<>()));
         assertThat(read.toString(), equalTo(expected.toString()));
 
+        final List<BomReadEntity> stream = Poiji.fromExcelToStream(getFileInputStream(), PoijiExcelType.CSV, BomReadEntity.class, options).collect(toList());
+        stream.forEach(writeEntity -> writeEntity.setUnknown(new HashMap<>()));
+        assertThat(stream.toString(), equalTo(expected.toString()));
+
+    }
+
+    private FileInputStream getFileInputStream() throws FileNotFoundException {
+        return new FileInputStream(path);
     }
 
 }

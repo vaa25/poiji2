@@ -2,6 +2,7 @@ package com.poiji.bind.mapping;
 
 import com.poiji.bind.PoijiInputStream;
 import com.poiji.bind.Unmarshaller;
+import com.poiji.exception.PoijiException;
 import com.poiji.option.PoijiOptions;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -10,6 +11,7 @@ import java.io.InputStreamReader;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 public final class CsvUnmarshallerStream implements Unmarshaller {
 
@@ -23,13 +25,19 @@ public final class CsvUnmarshallerStream implements Unmarshaller {
 
     @Override
     public <T> void unmarshal(final Class<T> type, final Consumer<? super T> consumer) {
+        stream(type).forEach(consumer);
+    }
+
+    @Override
+    public <T> Stream<T> stream(final Class<T> type) {
         final CsvLineReader<T> csvLineReader = new CsvLineReader<>(type,  options);
         final BomInputStream bomInputStream = new BomInputStream(poijiStream.stream());
         final String charsetName = bomInputStream.getCharset().orElse(options.getCharset());
-        try (final BufferedReader reader = new BufferedReader(new InputStreamReader(bomInputStream, charsetName))) {
-            reader.lines().map(csvLineReader::readLine).filter(Objects::nonNull).forEach(consumer);
+        try {
+            final BufferedReader reader = new BufferedReader(new InputStreamReader(bomInputStream, charsetName));
+            return reader.lines().map(csvLineReader::readLine).filter(Objects::nonNull);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new PoijiException("Problem occurred while reading CSV data", e);
         }
     }
 

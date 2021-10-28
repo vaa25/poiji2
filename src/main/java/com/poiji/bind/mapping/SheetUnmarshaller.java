@@ -3,6 +3,7 @@ package com.poiji.bind.mapping;
 import com.poiji.exception.PoijiException;
 import com.poiji.option.PoijiOptions;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 import org.apache.poi.hssf.usermodel.HSSFFormulaEvaluator;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -24,7 +25,11 @@ public final class SheetUnmarshaller extends HSSFUnmarshaller {
 
     @Override
     public <T> void unmarshal(Class<T> type, Consumer<? super T> consumer) {
+        setBaseFormulaEvaluator();
+        processRowsToObjects(sheet, type, consumer);
+    }
 
+    private void setBaseFormulaEvaluator() {
         Workbook workbook = workbook();
         if (workbook instanceof HSSFWorkbook) {
             baseFormulaEvaluator = HSSFFormulaEvaluator.create((HSSFWorkbook) workbook, null, null);
@@ -33,9 +38,13 @@ public final class SheetUnmarshaller extends HSSFUnmarshaller {
         } else {
             throw new PoijiException("Workbook is not supported.");
         }
-        processRowsToObjects(sheet, type, consumer);
     }
 
+    @Override
+    public <T> Stream<T> stream(final Class<T> type) {
+        setBaseFormulaEvaluator();
+        return super.processRowsToStream(sheet, type);
+    }
 
     @Override
     protected Workbook workbook() {

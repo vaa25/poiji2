@@ -4,10 +4,14 @@ import com.poiji.bind.Unmarshaller;
 import com.poiji.exception.PoijiException;
 import com.poiji.option.PoijiOptions;
 import com.poiji.save.TransposeUtil;
-import com.poiji.util.ReflectUtil;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.Optional;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 import org.apache.poi.hssf.usermodel.HSSFFormulaEvaluator;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.formula.BaseFormulaEvaluator;
@@ -36,20 +40,43 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
     @Override
     public <T> void unmarshal(Class<T> type, Consumer<? super T> consumer) {
         try (final HSSFWorkbook workbook = (HSSFWorkbook) workbook()) {
-            if (options.getTransposed()){
-                TransposeUtil.transpose(workbook);
-            }
-            final Optional<String> maybeSheetName = SheetNameExtractor.getSheetName(type, options);
-            baseFormulaEvaluator = HSSFFormulaEvaluator.create(workbook, null, null);
-            final Sheet sheet = this.getSheetToProcess(workbook, options, maybeSheetName.orElse(null));
-
+            final Sheet sheet = getSheet(type, workbook);
             processRowsToObjects(sheet, type, consumer);
         } catch (final IOException e) {
             throw new PoijiException("Problem occurred while closing HSSFWorkbook", e);
         }
     }
 
-    protected  <T> void processRowsToObjects(final Sheet sheet, final Class<T> type, final Consumer<? super T> consumer) {
+    private <T> Sheet getSheet(final Class<T> type, final HSSFWorkbook workbook) {
+        if (options.getTransposed()){
+            TransposeUtil.transpose(workbook);
+        }
+        final Optional<String> maybeSheetName = SheetNameExtractor.getSheetName(type, options);
+        baseFormulaEvaluator = HSSFFormulaEvaluator.create(workbook, null, null);
+        return this.getSheetToProcess(workbook, options, maybeSheetName.orElse(null));
+    }
+
+    @Override
+    public <T> Stream<T> stream(Class<T> type){
+        try (final HSSFWorkbook workbook = (HSSFWorkbook) workbook()) {
+            final Sheet sheet = getSheet(type, workbook);
+            return processRowsToStream(sheet, type);
+        } catch (final IOException e) {
+            throw new PoijiException("Problem occurred while closing HSSFWorkbook", e);
+        }
+    }
+
+    protected  <T> Stream<T> processRowsToStream(final Sheet sheet, final Class<T> type) {
+        final int skip = options.skip();
+        final int maxPhysicalNumberOfRows = sheet.getPhysicalNumberOfRows() + 1 - skip;
+        final HSSFReadMappedFields readMappedFields = loadColumnTitles(sheet, maxPhysicalNumberOfRows, type);
+        final Iterator<T> iterator = new HSSFStreamIterator<>(sheet.iterator(), readMappedFields, options);
+        final Spliterator<T> spliterator =
+            Spliterators.spliteratorUnknownSize(iterator, Spliterator.ORDERED | Spliterator.IMMUTABLE);
+        return StreamSupport.stream(spliterator, false);
+    }
+
+    protected <T> void processRowsToObjects(final Sheet sheet, final Class<T> type, final Consumer<? super T> consumer) {
         final int skip = options.skip();
         final int maxPhysicalNumberOfRows = sheet.getPhysicalNumberOfRows() + 1 - skip;
 
@@ -63,7 +90,7 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
                     return;
                 }
 
-                consumer.accept(readMappedFields.parseRow(currentRow, ReflectUtil.newInstanceOf(type)));
+                consumer.accept(readMappedFields.parseRow(currentRow));
             }
         }
     }

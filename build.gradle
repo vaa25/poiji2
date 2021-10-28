@@ -13,7 +13,7 @@ java {
 
 group 'io.github.vaa25'
 archivesBaseName = 'poiji2'
-version = System.getenv('RELEASE_VERSION') ?: "1.0.0"
+version = System.getenv('RELEASE_VERSION') ?: "1.1.0"
 
 repositories {
     mavenCentral()
