@@ -15,6 +15,7 @@ import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.Test;
 
+import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
@@ -36,6 +37,10 @@ public class FromExcelSheetTest {
         assertThat(result, notNullValue());
         CellFormatModel cellFormatModel = result.get(1);
         assertThat(cellFormatModel.getAge(), is(40));
+
+        List<CellFormatModel> stream = Poiji.fromExcelToStream(sheet, CellFormatModel.class).collect(toList());
+        assertThat(stream.get(1).getAge(), is(40));
+
     }
 
     @Test
@@ -50,6 +55,9 @@ public class FromExcelSheetTest {
         assertThat(result, notNullValue());
         CellFormatModel cellFormatModel = result.get(1);
         assertThat(cellFormatModel.getAge(), is(40));
+
+        List<CellFormatModel> stream = Poiji.fromExcelToStream(sheet, CellFormatModel.class).collect(toList());
+        assertThat(stream.get(1).getAge(), is(40));
     }
 
 
@@ -65,6 +73,9 @@ public class FromExcelSheetTest {
         assertThat(result, notNullValue());
         CellFormatModel cellFormatModel = result.get(1);
         assertThat(cellFormatModel.getAge(), is(40));
+
+        List<CellFormatModel> stream = Poiji.fromExcelToStream(sheet, CellFormatModel.class, PoijiOptions.PoijiOptionsBuilder.settings().build()).collect(toList());
+        assertThat(stream.get(1).getAge(), is(40));
     }
 
     @Test
@@ -90,5 +101,15 @@ public class FromExcelSheetTest {
         Workbook workbook = new SXSSFWorkbook(xssfWorkbook);
         Sheet sheet = workbook.getSheetAt(0);
         List<CellFormatModel> result = Poiji.fromExcel(sheet, CellFormatModel.class);
+    }
+
+    @Test(expected = PoijiException.class)
+    public void shouldMapXLSXSheetErrorWithStream() throws IOException {
+        File file = new File("src/test/resources/employees_format.xlsx");
+        FileInputStream fileInputStream = new FileInputStream(file);
+        XSSFWorkbook xssfWorkbook = new XSSFWorkbook(fileInputStream);
+        Workbook workbook = new SXSSFWorkbook(xssfWorkbook);
+        Sheet sheet = workbook.getSheetAt(0);
+        List<CellFormatModel> result = Poiji.fromExcelToStream(sheet, CellFormatModel.class).collect(toList());
     }
 }
