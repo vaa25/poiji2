@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Spliterator;
 import java.util.Spliterators;
@@ -21,6 +22,7 @@ import org.apache.poi.poifs.filesystem.DocumentFactoryHelper;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.util.IOUtils;
+import org.apache.poi.util.LocaleUtil;
 import org.apache.poi.util.XMLHelper;
 import org.apache.poi.xssf.eventusermodel.ReadOnlySharedStringsTable;
 import org.apache.poi.xssf.eventusermodel.XSSFReader;
@@ -199,10 +201,11 @@ abstract class XSSFUnmarshaller implements Unmarshaller {
                                   InputStream sheetInputStream,
                                   Consumer<? super T> consumer
     ) {
-
-        DataFormatter formatter = new DataFormatter();
-        InputSource sheetSource = new InputSource(sheetInputStream);
+        final Locale oldLocale = LocaleUtil.getUserLocale();
         try {
+            DataFormatter formatter = new DataFormatter();
+            InputSource sheetSource = new InputSource(sheetInputStream);
+            LocaleUtil.setUserLocale(options.getLocale());
             final ReadMappedFields mappedFields = new ReadMappedFields(type, options).parseEntity();
             XSSFPoijiHandler<T> poijiHandler = new XSSFPoijiHandler<>(type, options, consumer, mappedFields);
             ContentHandler contentHandler = new XSSFSheetXMLPoijiHandler(
@@ -219,6 +222,8 @@ abstract class XSSFUnmarshaller implements Unmarshaller {
 		} catch (SAXException | IOException e) {
             IOUtils.closeQuietly(sheetInputStream);
             throw new PoijiException("Problem occurred while reading data", e);
+        } finally {
+            LocaleUtil.setUserLocale(oldLocale);
         }
     }
 
@@ -231,6 +236,7 @@ abstract class XSSFUnmarshaller implements Unmarshaller {
         XSSFStreamIterator<T> poijiHandler = new XSSFStreamIterator<>(type, options, mappedFields);
 
         new Thread(() -> {
+            LocaleUtil.setUserLocale(options.getLocale());
             DataFormatter formatter = new DataFormatter();
             ContentHandler contentHandler = new XSSFSheetXMLPoijiHandler(
                 styles,

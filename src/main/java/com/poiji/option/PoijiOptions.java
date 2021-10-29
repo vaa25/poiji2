@@ -341,7 +341,6 @@ public final class PoijiOptions {
 
     private PoijiOptions setLocale(Locale locale) {
         this.locale = locale;
-        LocaleUtil.setUserLocale(locale);
         return this;
     }
 

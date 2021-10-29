@@ -48,7 +48,6 @@ public class PoijiOptionsTest {
         PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings().build();
 
         assertThat(options.getLocale(), equalTo(Locale.US));
-        assertThat(LocaleUtil.getUserLocale(), equalTo(Locale.US));
     }
 
     @Test
@@ -57,6 +56,5 @@ public class PoijiOptionsTest {
         PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings().setLocale(userLocale).build();
 
         assertThat(options.getLocale(), equalTo(userLocale));
-        assertThat(LocaleUtil.getUserLocale(), equalTo(userLocale));
     }
 }
