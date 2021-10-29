@@ -33,8 +33,7 @@ public final class HSSFPropertyStream implements PropertyUnmarshaller {
         return returnFromExcelFile(type);
     }
 
-    @Override
-    public <T> T returnFromExcelFile(Class<T> type) {
+    private <T> T returnFromExcelFile(Class<T> type) {
         try (OPCPackage open = OPCPackage.open(inputStream)) {
             PropertyHandler propertyHandler = new PropertyHandler();
             XSSFWorkbook xssfWorkbook = new XSSFWorkbook(open);
@@ -46,8 +45,7 @@ public final class HSSFPropertyStream implements PropertyUnmarshaller {
         }
     }
 
-    @Override
-    public <T> T returnFromEncryptedFile(Class<T> type) {
+    private <T> T returnFromEncryptedFile(Class<T> type) {
         try (POIFSFileSystem fs = new POIFSFileSystem(inputStream)) {
             InputStream stream = DocumentFactoryHelper.getDecryptedStream(fs, options.getPassword());
             try (OPCPackage open = OPCPackage.open(stream)) {

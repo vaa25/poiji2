@@ -7,7 +7,4 @@ public interface PropertyUnmarshaller {
 
     <T> T unmarshal(Class<T> type);
 
-    <T> T returnFromExcelFile(Class<T> type);
-
-    <T> T returnFromEncryptedFile(Class<T> type);
 }

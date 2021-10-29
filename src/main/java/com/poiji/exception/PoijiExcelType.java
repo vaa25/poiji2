@@ -18,7 +18,7 @@ public enum PoijiExcelType {
         } else if (fileName.endsWith(CSV_EXTENSION)) {
             return CSV;
         } else {
-            throw new InvalidExcelFileExtension("Unsupported extension of file " + fileName);
+            throw new InvalidExcelFileExtension("Unsupported file extension. Supported are: xlsx, xls, csv");
         }
     }
 }
