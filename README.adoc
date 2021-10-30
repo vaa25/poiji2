@@ -13,7 +13,7 @@ In your Maven/Gradle project, first add the corresponding dependency:
 <dependency>
     <groupId>io.github.vaa25</groupId>
     <artifactId>poiji2</artifactId>
-    <version>1.2.0</version>
+    <version>1.2.1</version>
 </dependency>
 
 ----
@@ -22,7 +22,7 @@ In your Maven/Gradle project, first add the corresponding dependency:
 [source,groovy]
 ----
 dependencies {
-    implementation 'io.github.vaa25:poiji2:1.2.0'
+    implementation 'io.github.vaa25:poiji2:1.2.1'
 }
 ----
 
