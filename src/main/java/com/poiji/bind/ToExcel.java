@@ -10,7 +10,7 @@ import java.io.OutputStream;
 import java.util.Collection;
 import java.util.stream.Stream;
 
-class ToExcel<T> {
+public class ToExcel<T> {
 
     private Source source;
     private Destination destination;

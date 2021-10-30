@@ -10,7 +10,7 @@ import java.io.InputStream;
 
 import static com.poiji.exception.PoijiExcelType.XLSX;
 
-class FromExcelProperties<T> {
+public class FromExcelProperties<T> {
 
     private Source source;
     private PoijiOptions options;

@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 import org.apache.poi.ss.usermodel.Sheet;
 
-class FromExcel<T> {
+public class FromExcel<T> {
 
     private Source source;
     private PoijiOptions options;
