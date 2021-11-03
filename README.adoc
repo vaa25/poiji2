@@ -10,11 +10,18 @@ In your Maven/Gradle project, first add the corresponding dependency:
 .maven
 [source,xml]
 ----
-<dependency>
-    <groupId>io.github.vaa25</groupId>
-    <artifactId>poiji2</artifactId>
-    <version>1.2.1</version>
-</dependency>
+<dependencies>
+    <dependency>
+        <groupId>io.github.vaa25</groupId>
+        <artifactId>poiji2</artifactId>
+        <version>1.2.1</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.poi</groupId>
+        <artifactId>poi-ooxml</artifactId>
+        <version>4.1.2</version>
+    </dependency>
+</dependencies>
 
 ----
 
@@ -23,6 +30,7 @@ In your Maven/Gradle project, first add the corresponding dependency:
 ----
 dependencies {
     implementation 'io.github.vaa25:poiji2:1.2.1'
+    implementation 'org.apache.poi:poi-ooxml:4.1.2'
 }
 ----
 
