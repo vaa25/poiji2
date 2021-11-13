@@ -11,50 +11,59 @@ public final class CsvLineReader<T> {
     private final ReadMappedFields readMappedFields;
     private final Class<T> entity;
     private final PoijiOptions options;
-    private boolean isFirstLine;
     private final Collection<Integer> usedColumns;
+    private boolean shouldParseHeaders = true;
+    private int contentRow = 1;
     private int row = 1;
 
     public CsvLineReader(final Class<T> entity, final PoijiOptions options) {
         this.readMappedFields = new ReadMappedFields(entity, options).parseEntity();
-        this.isFirstLine = true;
         this.options = options;
         this.entity = entity;
         this.usedColumns = new HashSet<>();
-
     }
 
     public T readLine(final String line) {
         if (line.isEmpty()){
             return null;
-        } else if (isFirstLine){
-            isFirstLine = false;
-            final String[] columnNames = parseLine(line);
-            for (int i = 0; i < columnNames.length; i++) {
-                final String columnName = unwrap(columnNames[i]);
-                if (!columnName.isEmpty()){
-                    readMappedFields.parseColumnName(i, columnName);
-                    usedColumns.add(i);
+        } else if (shouldParseHeaders){
+            return parseColumnNames(line);
+        } else if (options.skip() - options.getHeaderStart() <= row++){
+            return parseContentRow(line);
+        } else {
+            return null;
+        }
+    }
+
+    private T parseContentRow(final String line) {
+        final String[] values = parseLine(line);
+        if (areValuesHaveData(values)){
+            final T instance = ReflectUtil.newInstanceOf(entity);
+            for (int column = 0; column < values.length; column++) {
+                if (usedColumns.contains(column)){
+                    readMappedFields.setCellInInstance(contentRow, column, unwrap(values[column]), instance);
                 }
             }
-            readMappedFields.validateMandatoryNameColumns();
-            return null;
+            contentRow++;
+            return instance;
         } else {
-            final String[] values = parseLine(line);
-            if (areValuesHaveData(values)){
-                final T instance = ReflectUtil.newInstanceOf(entity);
-                for (int column = 0; column < values.length; column++) {
-                    if (usedColumns.contains(column)){
-                        readMappedFields.setCellInInstance(row, column, unwrap(values[column]), instance);
-                    }
-                }
-                row++;
-                return instance;
-            } else {
-                row++;
-                return null;
+            contentRow++;
+            return null;
+        }
+    }
+
+    private T parseColumnNames(final String line) {
+        shouldParseHeaders = false;
+        final String[] columnNames = parseLine(line);
+        for (int i = 0; i < columnNames.length; i++) {
+            final String columnName = unwrap(columnNames[i]);
+            if (!columnName.isEmpty()){
+                readMappedFields.parseColumnName(i, columnName);
+                usedColumns.add(i);
             }
         }
+        readMappedFields.validateMandatoryNameColumns();
+        return null;
     }
 
     private String[] parseLine(final String line) {

@@ -23,7 +23,7 @@ import static org.junit.Assert.fail;
 @RunWith(Parameterized.class)
 public class DeserializeByCellRangeTest {
 
-    private String path;
+    private final String path;
 
     public DeserializeByCellRangeTest(String path) {
         this.path = path;
@@ -33,7 +33,8 @@ public class DeserializeByCellRangeTest {
     public static Iterable<Object[]> queries() {
         return Arrays.asList(new Object[][]{
                 {"src/test/resources/test_multi.xlsx"},
-                {"src/test/resources/test_multi.xls"}
+                {"src/test/resources/test_multi.xls"},
+                {"src/test/resources/test_multi.csv"}
         });
     }
 
