@@ -50,9 +50,7 @@ public class MandatoryNamedColumnsTest {
     @Test(expected = HeaderMissingException.class)
     public void testExcelMandatoryColumnFail() {
 
-        Poiji.fromExcel(new File(path), PersonByNameWithMandatoryColumn.class, PoijiOptions.PoijiOptionsBuilder
-            .settings()
-            .namedHeaderMandatory(false)
-            .build());
+        final PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings().namedHeaderMandatory(false).build();
+        Poiji.fromExcel(new File(path), PersonByNameWithMandatoryColumn.class, options);
     }
 }

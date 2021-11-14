@@ -68,8 +68,6 @@ public class ReadMappedFields {
         return this;
     }
 
-
-
     public void validateMandatoryNameColumns(){
         AnnotationUtil.validateMandatoryNameColumns(options, entity, columnNames);
     }

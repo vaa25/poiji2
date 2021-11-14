@@ -12,9 +12,8 @@ public final class CsvLineReader<T> {
     private final Class<T> entity;
     private final PoijiOptions options;
     private final Collection<Integer> usedColumns;
-    private boolean shouldParseHeaders = true;
-    private int contentRow = 1;
-    private int row = 1;
+    private int row = 0;
+    private int internalCount = 1;
 
     public CsvLineReader(final Class<T> entity, final PoijiOptions options) {
         this.readMappedFields = new ReadMappedFields(entity, options).parseEntity();
@@ -24,15 +23,24 @@ public final class CsvLineReader<T> {
     }
 
     public T readLine(final String line) {
-        if (line.isEmpty()){
-            return null;
-        } else if (shouldParseHeaders){
+        final int row = this.row++;
+        if (isHeaderRow(row)){
             return parseColumnNames(line);
-        } else if (options.skip() - options.getHeaderStart() <= row++){
+        } else if (isContentRow(row)){
             return parseContentRow(line);
         } else {
             return null;
         }
+    }
+
+    private boolean isContentRow(final int rowNum) {
+        return rowNum > options.skip() + options.getHeaderStart() + options.getHeaderCount() - 1 && (options.getLimit() == 0 || internalCount <= options.getLimit());
+    }
+
+    private boolean isHeaderRow(final int row) {
+        int headerStart = options.getHeaderStart();
+        int headerCount = options.getHeaderCount();
+        return row >= headerStart && row < headerStart + headerCount;
     }
 
     private T parseContentRow(final String line) {
@@ -40,20 +48,19 @@ public final class CsvLineReader<T> {
         if (areValuesHaveData(values)){
             final T instance = ReflectUtil.newInstanceOf(entity);
             for (int column = 0; column < values.length; column++) {
-                if (usedColumns.contains(column)){
-                    readMappedFields.setCellInInstance(contentRow, column, unwrap(values[column]), instance);
+                if (usedColumns.contains(column) || readMappedFields.orderedFields.containsKey(column)){
+                    readMappedFields.setCellInInstance(internalCount, column, unwrap(values[column]), instance);
                 }
             }
-            contentRow++;
+            internalCount++;
             return instance;
         } else {
-            contentRow++;
+            internalCount++;
             return null;
         }
     }
 
     private T parseColumnNames(final String line) {
-        shouldParseHeaders = false;
         final String[] columnNames = parseLine(line);
         for (int i = 0; i < columnNames.length; i++) {
             final String columnName = unwrap(columnNames[i]);

@@ -19,10 +19,9 @@ class XSSFPoijiHandler<T> implements SheetContentsHandler {
     protected Consumer<? super T> consumer;
     private int internalRow;
     private int internalCount;
-    private int limit;
 
-    private Class<T> type;
-    private PoijiOptions options;
+    private final Class<T> type;
+    private final PoijiOptions options;
 
     private final ReadMappedFields mappedFields;
 
@@ -32,7 +31,6 @@ class XSSFPoijiHandler<T> implements SheetContentsHandler {
         this.type = type;
         this.options = options;
         this.consumer = consumer;
-        this.limit = options.getLimit();
 
         this.mappedFields = mappedFields;
     }
@@ -42,13 +40,12 @@ class XSSFPoijiHandler<T> implements SheetContentsHandler {
     ) {
         this.type = type;
         this.options = options;
-        this.limit = options.getLimit();
         this.mappedFields = mappedFields;
     }
 
     @Override
     public void startRow(int rowNum) {
-        if (rowNum + 1 > options.skip()) {
+        if (isContentRow(rowNum)) {
             internalCount += 1;
             instance = ReflectUtil.newInstanceOf(type);
         }
@@ -57,14 +54,14 @@ class XSSFPoijiHandler<T> implements SheetContentsHandler {
     @Override
     public void endRow(int rowNum) {
 
-        if (internalRow != rowNum)
+        if (internalRow != rowNum || isHeaderRow(rowNum))
 			return;
 
-        if (rowNum + 1 > options.skip()) {
+        if (isContentRow(rowNum)) {
             consumer.accept(instance);
         }
 
-        if (rowNum <= options.getHeaderStart()) {
+        if (rowNum <= options.getHeaderStart() + options.getHeaderCount()) {
             mappedFields.validateMandatoryNameColumns();
         }
     }
@@ -74,24 +71,27 @@ class XSSFPoijiHandler<T> implements SheetContentsHandler {
         CellAddress cellAddress = new CellAddress(cellReference);
         int row = cellAddress.getRow();
 
-        int headers = options.getHeaderStart();
         int column = cellAddress.getColumn();
-
-        if (row <= headers) {
+        if (isHeaderRow(row)) {
             mappedFields.parseColumnName(column, formattedValue);
-        }
-
-        if (row + 1 <= options.skip()) {
             return;
         }
 
-        if (limit != 0 && internalCount > limit) {
-            return;
+        if (isContentRow(row)){
+            internalRow = row;
+            mappedFields.setCellInInstance(internalRow, column, formattedValue, instance);
         }
 
-        internalRow = row;
+    }
 
-        mappedFields.setCellInInstance(internalRow, column, formattedValue, instance);
+    private boolean isContentRow(final int rowNum) {
+        return rowNum > options.skip() + options.getHeaderStart() + options.getHeaderCount() - 1 && (options.getLimit() == 0 || internalCount <= options.getLimit());
+    }
+
+    private boolean isHeaderRow(final int row) {
+        int headerStart = options.getHeaderStart();
+        int headerCount = options.getHeaderCount();
+        return row >= headerStart && row < headerStart + headerCount;
     }
 
     @Override

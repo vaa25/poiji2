@@ -42,7 +42,7 @@ public final class HSSFStreamIterator<T> implements Iterator<T> {
     }
 
     private boolean skip(final Row currentRow) {
-        return currentRow.getRowNum() + 1 <= options.skip();
+        return currentRow.getRowNum() < options.getHeaderStart() + options.getHeaderCount();
     }
 
     private boolean isRowEmpty(Row row) {

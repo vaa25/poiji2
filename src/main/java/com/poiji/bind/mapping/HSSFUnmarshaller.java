@@ -83,7 +83,7 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
         final HSSFReadMappedFields readMappedFields = loadColumnTitles(sheet, maxPhysicalNumberOfRows, type);
 
         for (final Row currentRow : sheet) {
-            if (!skip(currentRow, skip) && !isRowEmpty(currentRow)) {
+            if (!skip(currentRow) && !isRowEmpty(currentRow)) {
                 internalCount += 1;
 
                 if (limit != 0 && internalCount > limit) {
@@ -126,14 +126,14 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
 
     private HSSFReadMappedFields loadColumnTitles(Sheet sheet, int maxPhysicalNumberOfRows, final Class<?> type) {
         final HSSFReadMappedFields readMappedFields = new HSSFReadMappedFields(type, baseFormulaEvaluator,  options).parseEntity();
-        if (maxPhysicalNumberOfRows > 0) {
-            readMappedFields.parseColumnNames(sheet.getRow(options.getHeaderStart()));
+        if (maxPhysicalNumberOfRows > 0 && options.getHeaderCount() > 0) {
+            readMappedFields.parseColumnNames(sheet.getRow(options.getHeaderStart() + options.getHeaderCount() - 1));
         }
         return readMappedFields;
     }
 
-    private boolean skip(final Row currentRow, int skip) {
-        return currentRow.getRowNum() + 1 <= skip;
+    private boolean skip(final Row currentRow) {
+        return currentRow.getRowNum() < options.getHeaderStart() + options.getHeaderCount() + options.skip();
     }
 
     private boolean isRowEmpty(Row row) {

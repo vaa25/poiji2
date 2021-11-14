@@ -26,7 +26,7 @@ public class AnnotationUtil {
     public static <T> void validateMandatoryNameColumns(PoijiOptions options,
                                                         Class<T> modelType,
                                                         Collection<String> headerNames) {
-        final Collection<String> excelCellNames = ReflectUtil
+        final Collection<String> mandatoryColumnNames = ReflectUtil
             .findRecursivePoijiAnnotations(modelType, ExcelCellName.class)
             .stream()
             .filter(excelCellName -> options.getNamedHeaderMandatory() || excelCellName.mandatory())
@@ -37,10 +37,10 @@ public class AnnotationUtil {
             ? String::equalsIgnoreCase
             : String::equals;
 
-        final Set<String> missingHeaders = excelCellNames
+        final Set<String> missingHeaders = mandatoryColumnNames
             .stream()
-            .filter(excelCellName -> {
-                final String transformed = options.getFormatting().transform(options, excelCellName);
+            .filter(mandatoryColumnName -> {
+                final String transformed = options.getFormatting().transform(options, mandatoryColumnName);
                 return headerNames.stream().noneMatch(title -> comparator.test(transformed, title));
             })
             .collect(toSet());

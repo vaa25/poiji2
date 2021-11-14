@@ -42,19 +42,20 @@ public final class PoijiOptions {
     private Casting casting;
     private ToCellCasting toCellCasting;
     private int headerStart;
+    private int headerCount;
     private String sheetName;
     private boolean caseInsensitive;
     private boolean ignoreWhitespaces;
     private boolean namedHeaderMandatory;
     private PoijiLogCellFormat poijiLogCellFormat;
-    private PoijiNumberFormat numberFormat;
+    private PoijiNumberFormat numberFormat = StylesFormat.loadDefaultStyles();
     private boolean disableXLSXNumberCellFormat;
     private char csvDelimiter;
     private boolean transposed;
     private String charset;
     private String listDelimiter;
     private Formatting formatting;
-    private Locale locale;;
+    private Locale locale;
 
     public boolean getIgnoreWhitespaces() {
         return ignoreWhitespaces;
@@ -344,6 +345,15 @@ public final class PoijiOptions {
         return this;
     }
 
+    public int getHeaderCount() {
+        return headerCount;
+    }
+
+    public PoijiOptions setHeaderCount(final int headerCount) {
+        this.headerCount = headerCount;
+        return this;
+    }
+
     public static class PoijiOptionsBuilder {
 
         private int sheetIndex;
@@ -365,6 +375,7 @@ public final class PoijiOptions {
         private PoijiNumberFormat numberFormat;
         private boolean disabledXLSXNumberCellFormat;
         private int headerStart = 0;
+        private int headerCount = 1;
         private int skip = 0;
         private int limit = 0;
         private String sheetName;
@@ -535,7 +546,7 @@ public final class PoijiOptions {
 
         public PoijiOptions build() {
             return new PoijiOptions()
-                .setSkip(skip + headerStart + 1)
+                .setSkip(skip)
                 .setPassword(password)
                 .setPreferNullOverDefault(preferNullOverDefault)
                 .setDatePattern(datePattern)
@@ -551,6 +562,7 @@ public final class PoijiOptions {
                 .setDateTimeRegex(dateTimeRegex)
                 .setDateLenient(dateLenient)
                 .setHeaderStart(headerStart)
+                .setHeaderCount(headerCount)
                 .setCasting(casting)
                 .setToCellCasting(toCellCasting)
                 .setLimit(limit)
@@ -732,6 +744,23 @@ public final class PoijiOptions {
                 throw new PoijiException("Header index must be greater than or equal to 0");
             }
             this.headerStart = headerStart;
+            return this;
+        }
+
+        /**
+         * This is to set the number of row contains headers
+         * <br/>
+         * Set 0 to indicate that no header in the excel file.
+         * Default - 1.
+         *
+         * @param headerCount an index number of the excel header to start reading header
+         * @return this
+         */
+        public PoijiOptionsBuilder headerCount(int headerCount) {
+            if (headerCount < 0) {
+                throw new PoijiException("Number of header row must be greater than 0");
+            }
+            this.headerCount = headerCount;
             return this;
         }
 
