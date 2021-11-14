@@ -749,7 +749,6 @@ public final class PoijiOptions {
 
         /**
          * This is to set the number of row contains headers
-         * <br/>
          * Set 0 to indicate that no header in the excel file.
          * Default - 1.
          *

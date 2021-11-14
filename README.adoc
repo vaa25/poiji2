@@ -14,7 +14,7 @@ In your Maven/Gradle project, first add the corresponding dependency:
     <dependency>
         <groupId>io.github.vaa25</groupId>
         <artifactId>poiji2</artifactId>
-        <version>1.2.1</version>
+        <version>1.2.2</version>
     </dependency>
     <dependency>
         <groupId>org.apache.poi</groupId>
@@ -29,7 +29,7 @@ In your Maven/Gradle project, first add the corresponding dependency:
 [source,groovy]
 ----
 dependencies {
-    implementation 'io.github.vaa25:poiji2:1.2.1'
+    implementation 'io.github.vaa25:poiji2:1.2.2'
     implementation 'org.apache.poi:poi-ooxml:4.1.2'
 }
 ----
