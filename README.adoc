@@ -14,7 +14,7 @@ In your Maven/Gradle project, first add the corresponding dependency:
     <dependency>
         <groupId>io.github.vaa25</groupId>
         <artifactId>poiji2</artifactId>
-        <version>1.2.2</version>
+        <version>1.3.0</version>
     </dependency>
     <dependency>
         <groupId>org.apache.poi</groupId>
@@ -29,14 +29,14 @@ In your Maven/Gradle project, first add the corresponding dependency:
 [source,groovy]
 ----
 dependencies {
-    implementation 'io.github.vaa25:poiji2:1.2.2'
+    implementation 'io.github.vaa25:poiji2:1.3.0'
     implementation 'org.apache.poi:poi-ooxml:4.1.2'
 }
 ----
 
 You can find feature descriptions in https://github.com/ozlerhakan/poiji README
 
-Supported features: 1 - 17.
+Supported all features of original Poiji.
 
 Also:
 
@@ -50,3 +50,4 @@ Also:
 - Poiji2 can transform excel to Stream (use `Poiji.fromExcelToStream(...)`). WARNING! XLSX takes double time more than transform to List.
 - Poiji2 has usable builders for any case (ex. use `Poiji.<JavaClass>fromExcel().withSource(new File(...)).withJavaType(JavaClass.class).toStream()`)
 - Poiji2 (since v1.2.1) can be used with https://github.com/vaa25/spring-boot-starter-web-excel[spring-boot-starter-web-excel]
+- Poiji2 can read lists in row (use `@ExcelList` on `List`)

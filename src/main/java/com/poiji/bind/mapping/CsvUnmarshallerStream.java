@@ -35,7 +35,13 @@ public final class CsvUnmarshallerStream implements Unmarshaller {
         final String charsetName = bomInputStream.getCharset().orElse(options.getCharset());
         try {
             final BufferedReader reader = new BufferedReader(new InputStreamReader(bomInputStream, charsetName));
-            return reader.lines().map(csvLineReader::readLine).filter(Objects::nonNull);
+            Stream<String> stream = reader.lines();
+            if (options.getLimit() > 0) {
+                stream =
+                    stream.limit(
+                        options.getLimit() + options.getHeaderStart() + options.getHeaderCount() + options.skip());
+            }
+            return stream.map(csvLineReader::readLine).filter(Objects::nonNull);
         } catch (IOException e) {
             throw new PoijiException("Problem occurred while reading CSV data", e);
         }

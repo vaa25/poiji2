@@ -25,7 +25,7 @@ public class IgnoreTest {
 
     @Parameterized.Parameters
     public static List<String> excel() {
-        return asList("src/test/resources/ignore.xlsx", "src/test/resources/ignore.xls");
+        return asList("src/test/resources/ignore.xlsx", "src/test/resources/ignore.xls", "src/test/resources/ignore.csv");
     }
 
     @Test

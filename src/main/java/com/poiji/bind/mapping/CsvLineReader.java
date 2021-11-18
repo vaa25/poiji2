@@ -23,33 +23,37 @@ public final class CsvLineReader<T> {
     }
 
     public T readLine(final String line) {
-        final int row = this.row++;
-        if (isHeaderRow(row)){
-            return parseColumnNames(line);
-        } else if (isContentRow(row)){
-            return parseContentRow(line);
+        final T result;
+        if (isHeaderRow()){
+            result = parseColumnNames(line);
+        } else if (isContentRow()){
+            result = parseContentRow(line);
         } else {
-            return null;
+            result = null;
         }
+        row++;
+        return result;
     }
 
-    private boolean isContentRow(final int rowNum) {
-        return rowNum > options.skip() + options.getHeaderStart() + options.getHeaderCount() - 1 && (options.getLimit() == 0 || internalCount <= options.getLimit());
+    private boolean isContentRow() {
+        return row > options.skip() + options.getHeaderStart() + options.getHeaderCount() - 1 && (options.getLimit() == 0 || internalCount <= options.getLimit());
     }
 
-    private boolean isHeaderRow(final int row) {
+    private boolean isHeaderRow() {
         int headerStart = options.getHeaderStart();
         int headerCount = options.getHeaderCount();
+        this.internalCount = headerStart + headerCount;
         return row >= headerStart && row < headerStart + headerCount;
     }
 
     private T parseContentRow(final String line) {
         final String[] values = parseLine(line);
-        if (areValuesHaveData(values)){
+        final int lastValuedColumn = lastValuedColumn(values);
+        if (lastValuedColumn >= 0) {
             final T instance = ReflectUtil.newInstanceOf(entity);
-            for (int column = 0; column < values.length; column++) {
-                if (usedColumns.contains(column) || readMappedFields.orderedFields.containsKey(column)){
-                    readMappedFields.setCellInInstance(internalCount, column, unwrap(values[column]), instance);
+            for (int column = 0; column <= lastValuedColumn; column++) {
+                if (usedColumns.contains(column) || readMappedFields.orderedFields.containsKey(column)) {
+                    readMappedFields.setCellInInstance(row, column, unwrap(values[column]), instance);
                 }
             }
             internalCount++;
@@ -107,13 +111,13 @@ public final class CsvLineReader<T> {
         BEGIN, MIDDLE, QUOTE
     }
 
-    private boolean areValuesHaveData(final String[] values) {
-        for (final String value : values) {
-            if (!value.isEmpty()){
-                return true;
+    private int lastValuedColumn(final String[] values) {
+        for (int i = values.length - 1; i >= 0; i--) {
+            if (!values[i].isEmpty()) {
+                return i;
             }
         }
-        return false;
+        return -1;
     }
 
     private String unwrap(final String value) {
