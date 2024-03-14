@@ -51,3 +51,4 @@ Also:
 - Poiji2 has usable builders for any case (ex. use `Poiji.<JavaClass>fromExcel().withSource(new File(...)).withJavaType(JavaClass.class).toStream()`)
 - Poiji2 (since v1.2.1) can be used with https://github.com/vaa25/spring-boot-starter-web-excel[spring-boot-starter-web-excel]
 - Poiji2 can read lists in row (use `@ExcelList` on `List`)
+- Poiji2 can read and write huge xlsx files (see HugeTest.java)
