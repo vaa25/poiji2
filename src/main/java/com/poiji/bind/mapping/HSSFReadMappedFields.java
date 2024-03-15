@@ -2,7 +2,7 @@ package com.poiji.bind.mapping;
 
 import com.poiji.annotation.DisableCellFormatXLS;
 import com.poiji.option.PoijiOptions;
-import com.poiji.util.ReflectUtil;
+
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.HashSet;
@@ -62,20 +62,16 @@ public final class HSSFReadMappedFields extends ReadMappedFields{
     }
 
     public <T> T parseRow(final Row row) {
-        final T instance = ReflectUtil.newInstanceOf((Class<T>) entity);
-        setRowInInstance(row, instance);
-        return instance;
-    }
-
-    private <T> void setRowInInstance(final Row row, final T instance) {
+        final Data data = createInstanceData();
         for (short columnOrder = row.getFirstCellNum(); columnOrder < row.getLastCellNum(); columnOrder++) {
             final Cell cell = row.getCell(columnOrder);
             if (disabledCellFormat.contains(columnOrder)){
                 cell.setCellStyle(null);
             }
             final String cellValue = dataFormatter.formatCellValue(cell, baseFormulaEvaluator);
-            setCellInInstance(row.getRowNum(), columnOrder, cellValue, instance);
+            setCellInData(row.getRowNum(), columnOrder, cellValue, data);
         }
+        return (T) createNewInstance(data);
     }
 
     public void parseColumnNames(final Row row) {

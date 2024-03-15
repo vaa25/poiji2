@@ -1,7 +1,7 @@
 package com.poiji.bind.mapping;
 
 import com.poiji.option.PoijiOptions;
-import com.poiji.util.ReflectUtil;
+
 import java.util.function.Consumer;
 import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler.SheetContentsHandler;
@@ -15,30 +15,26 @@ import org.apache.poi.xssf.usermodel.XSSFComment;
  */
 class XSSFPoijiHandler<T> implements SheetContentsHandler {
 
-    private T instance;
+    private Data data;
     protected Consumer<? super T> consumer;
     private int internalRow;
     private int internalCount;
 
-    private final Class<T> type;
     private final PoijiOptions options;
 
     private final ReadMappedFields mappedFields;
 
     XSSFPoijiHandler(
-        Class<T> type, PoijiOptions options, Consumer<? super T> consumer, final ReadMappedFields mappedFields
+        PoijiOptions options, Consumer<? super T> consumer, final ReadMappedFields mappedFields
     ) {
-        this.type = type;
         this.options = options;
         this.consumer = consumer;
-
         this.mappedFields = mappedFields;
     }
 
     XSSFPoijiHandler(
-        Class<T> type, PoijiOptions options,  final ReadMappedFields mappedFields
+        PoijiOptions options,  final ReadMappedFields mappedFields
     ) {
-        this.type = type;
         this.options = options;
         this.mappedFields = mappedFields;
     }
@@ -47,7 +43,7 @@ class XSSFPoijiHandler<T> implements SheetContentsHandler {
     public void startRow(int rowNum) {
         if (isContentRow(rowNum)) {
             internalCount += 1;
-            instance = ReflectUtil.newInstanceOf(type);
+            data = mappedFields.createInstanceData();
         }
     }
 
@@ -58,7 +54,7 @@ class XSSFPoijiHandler<T> implements SheetContentsHandler {
 			return;
 
         if (isContentRow(rowNum)) {
-            consumer.accept(instance);
+            consumer.accept((T) mappedFields.createNewInstance(data));
         }
 
         if (rowNum <= options.getHeaderStart() + options.getHeaderCount()) {
@@ -79,7 +75,7 @@ class XSSFPoijiHandler<T> implements SheetContentsHandler {
 
         if (isContentRow(row)){
             internalRow = row;
-            mappedFields.setCellInInstance(internalRow, column, formattedValue, instance);
+            mappedFields.setCellInData(internalRow, column, formattedValue, data);
         }
 
     }

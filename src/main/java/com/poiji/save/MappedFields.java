@@ -50,10 +50,14 @@ public final class MappedFields {
                     final String name = field.getName();
                     orders.put(field, excelOrder);
                     names.put(field, name);
-                    field.setAccessible(true);
+                    if (!field.isAccessible()) {
+                        field.setAccessible(true);
+                    }
                 } else if (field.getAnnotation(ExcelUnknownCells.class) != null) {
                     unknownCells.add(field);
-                    field.setAccessible(true);
+                    if (!field.isAccessible()) {
+                        field.setAccessible(true);
+                    }
                 } else {
                     final ExcelCellName annotation = field.getAnnotation(ExcelCellName.class);
                     if (annotation != null) {
@@ -68,7 +72,9 @@ public final class MappedFields {
                             orders.put(field, order);
                         }
                         names.put(field, excelName);
-                        field.setAccessible(true);
+                        if (!field.isAccessible()) {
+                            field.setAccessible(true);
+                        }
                     }
                 }
             }
