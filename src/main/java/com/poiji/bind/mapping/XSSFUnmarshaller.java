@@ -207,7 +207,7 @@ abstract class XSSFUnmarshaller implements Unmarshaller {
             InputSource sheetSource = new InputSource(sheetInputStream);
             LocaleUtil.setUserLocale(options.getLocale());
             final ReadMappedFields mappedFields = new ReadMappedFields(type, options).parseEntity();
-            XSSFPoijiHandler<T> poijiHandler = new XSSFPoijiHandler<>(type, options, consumer, mappedFields);
+            final XSSFPoijiHandler<T> poijiHandler = new XSSFPoijiHandler<>(options, consumer, mappedFields);
             ContentHandler contentHandler = new XSSFSheetXMLPoijiHandler(
                 styles,
                 null,
@@ -233,7 +233,7 @@ abstract class XSSFUnmarshaller implements Unmarshaller {
     ) {
 
         final ReadMappedFields mappedFields = new ReadMappedFields(type, options).parseEntity();
-        XSSFStreamIterator<T> poijiHandler = new XSSFStreamIterator<>(type, options, mappedFields);
+        final XSSFStreamIterator<T> poijiHandler = new XSSFStreamIterator<>(options, mappedFields);
 
         new Thread(() -> {
             LocaleUtil.setUserLocale(options.getLocale());

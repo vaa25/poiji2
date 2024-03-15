@@ -14,12 +14,12 @@ In your Maven/Gradle project, first add the corresponding dependency:
     <dependency>
         <groupId>io.github.vaa25</groupId>
         <artifactId>poiji2</artifactId>
-        <version>1.3.0</version>
+        <version>1.4.0</version>
     </dependency>
     <dependency>
         <groupId>org.apache.poi</groupId>
         <artifactId>poi-ooxml</artifactId>
-        <version>4.1.2</version>
+        <version>5.2.5</version>
     </dependency>
 </dependencies>
 
@@ -29,14 +29,12 @@ In your Maven/Gradle project, first add the corresponding dependency:
 [source,groovy]
 ----
 dependencies {
-    implementation 'io.github.vaa25:poiji2:1.3.0'
-    implementation 'org.apache.poi:poi-ooxml:4.1.2'
+    implementation 'io.github.vaa25:poiji2:1.4.0'
+    implementation 'org.apache.poi:poi-ooxml:5.2.5'
 }
 ----
 
-You can find feature descriptions in https://github.com/ozlerhakan/poiji README
-
-Supported all features of original Poiji.
+Supported all features of original Poiji implemented before 2021.
 
 Also:
 
@@ -52,3 +50,4 @@ Also:
 - Poiji2 (since v1.2.1) can be used with https://github.com/vaa25/spring-boot-starter-web-excel[spring-boot-starter-web-excel]
 - Poiji2 can read lists in row (use `@ExcelList` on `List`)
 - Poiji2 can read and write huge xlsx files (see HugeTest.java)
+- Poiji2 (since v1.4.0) can work with immutable java classes (see IgnoreTest.java). lombok @Value and java records applicable also.

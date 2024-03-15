@@ -1,7 +1,7 @@
 package com.poiji.bind.mapping;
 
 import com.poiji.option.PoijiOptions;
-import com.poiji.util.ReflectUtil;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -9,7 +9,6 @@ import java.util.HashSet;
 public final class CsvLineReader<T> {
 
     private final ReadMappedFields readMappedFields;
-    private final Class<T> entity;
     private final PoijiOptions options;
     private final Collection<Integer> usedColumns;
     private int row = 0;
@@ -18,7 +17,6 @@ public final class CsvLineReader<T> {
     public CsvLineReader(final Class<T> entity, final PoijiOptions options) {
         this.readMappedFields = new ReadMappedFields(entity, options).parseEntity();
         this.options = options;
-        this.entity = entity;
         this.usedColumns = new HashSet<>();
     }
 
@@ -50,14 +48,14 @@ public final class CsvLineReader<T> {
         final String[] values = parseLine(line);
         final int lastValuedColumn = lastValuedColumn(values);
         if (lastValuedColumn >= 0) {
-            final T instance = ReflectUtil.newInstanceOf(entity);
+            final Data data = readMappedFields.createInstanceData();
             for (int column = 0; column <= lastValuedColumn; column++) {
                 if (usedColumns.contains(column) || readMappedFields.orderedFields.containsKey(column)) {
-                    readMappedFields.setCellInInstance(row, column, unwrap(values[column]), instance);
+                    readMappedFields.setCellInData(row, column, unwrap(values[column]), data);
                 }
             }
             internalCount++;
-            return instance;
+            return (T) readMappedFields.createNewInstance(data);
         } else {
             internalCount++;
             return null;

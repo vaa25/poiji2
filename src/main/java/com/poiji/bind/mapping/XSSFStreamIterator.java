@@ -13,10 +13,10 @@ public final class XSSFStreamIterator<T> extends XSSFPoijiHandler<T> implements 
     private final BlockingQueue<T> queue = new ArrayBlockingQueue<>(1000, true);
 
     XSSFStreamIterator(
-        final Class<T> type, final PoijiOptions options,
+        final PoijiOptions options,
         final ReadMappedFields mappedFields
     ) {
-        super(type, options, mappedFields);
+        super(options, mappedFields);
         this.consumer = this::put;
     }
 

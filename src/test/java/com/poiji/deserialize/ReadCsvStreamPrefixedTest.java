@@ -2,6 +2,7 @@ package com.poiji.deserialize;
 
 import com.poiji.bind.Poiji;
 import com.poiji.deserialize.model.BomReadEntity;
+import com.poiji.deserialize.model.BomReadImmutable;
 import com.poiji.exception.PoijiExcelType;
 import com.poiji.option.PoijiOptions;
 import java.io.FileInputStream;
@@ -15,6 +16,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -42,6 +44,7 @@ public class ReadCsvStreamPrefixedTest {
     @Ignore("Failed in github actions")
     public void read() throws FileNotFoundException {
         final Map<String, String> unknown = new HashMap<>();
+        unknown.put("foo", "bar");
         final List<BomReadEntity> expected = new ArrayList<>();
         final BomReadEntity entity = new BomReadEntity()
             .setPrimitiveDouble(10.0)
@@ -77,6 +80,68 @@ public class ReadCsvStreamPrefixedTest {
 
         final List<BomReadEntity> stream = Poiji.fromExcelToStream(getFileInputStream(), PoijiExcelType.CSV, BomReadEntity.class, options).collect(toList());
         stream.forEach(writeEntity -> writeEntity.setUnknown(new HashMap<>()));
+        assertThat(stream.toString(), equalTo(expected.toString()));
+
+    }
+
+    @Test
+    @Ignore("Failed in github actions")
+    public void readImmutable() throws FileNotFoundException {
+        final List<BomReadImmutable> expected = new ArrayList<>();
+        final BomReadImmutable first = new BomReadImmutable(
+                1L,
+                "test",
+                21.0f,
+                20.0f,
+                10.0,
+                11.0,
+                true,
+                true,
+                new Date(1234567890L),
+                LocalDate.of(2020, 1, 2),
+                LocalDateTime.of(2020, 1, 2, 12, 0),
+                new BigDecimal("123.3456"),
+                (byte) -1,
+                (byte) -2,
+                (short) -3,
+                (short) -4,
+                null
+                );
+        first.getUnknown().put("foo", "bar");
+        first.getAnotherUnknown().put("foo", "bar");
+
+        expected.add(first);
+        final BomReadImmutable second = new BomReadImmutable(0L,
+                null,
+                null,
+                0.0f,
+                0.0,
+                null,
+                false,
+                null,
+                null,
+                null,
+                null,
+                null,
+                (byte) 0,
+                null,
+                (short) 0,
+                null,
+                null
+        );
+        expected.add(second);
+        final PoijiOptions options = PoijiOptions.PoijiOptionsBuilder
+                .settings()
+                .csvDelimiter(',')
+                .datePattern("dd-MM-yyyy HH:mm:ss")
+                .preferNullOverDefault(true)
+                .build();
+
+
+        final List<BomReadImmutable> read = Poiji.fromExcel(getFileInputStream(), PoijiExcelType.CSV, BomReadImmutable.class, options);
+        assertThat(read.toString(), equalTo(expected.toString()));
+
+        final List<BomReadImmutable> stream = Poiji.fromExcelToStream(getFileInputStream(), PoijiExcelType.CSV, BomReadImmutable.class, options).collect(toList());
         assertThat(stream.toString(), equalTo(expected.toString()));
 
     }

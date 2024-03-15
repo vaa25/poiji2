@@ -10,18 +10,17 @@ import com.poiji.annotation.ExcelUnknownCells;
 import com.poiji.annotation.ExcelWriteOnly;
 import com.poiji.config.Casting;
 import com.poiji.exception.ExcelParseException;
-import com.poiji.exception.IllegalCastException;
 import com.poiji.option.PoijiOptions;
 import com.poiji.util.AnnotationUtil;
 import com.poiji.util.ReflectUtil;
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 
 import static com.poiji.annotation.ExcelCellName.ABSENT_ORDER;
 import static java.util.Arrays.asList;
@@ -111,31 +110,31 @@ public class ReadMappedFields {
         listFields.values().forEach(ReadMappedList::validateMandatoryNameColumns);
     }
 
-    public Object createNewInstance(){
-        return ReflectUtil.newInstanceOf(entity);
+    public Object createNewInstance(Data data){
+        return ReflectUtil.newInstanceOf(entity, data);
     }
 
-    public void setCellInInstance(final int row, final int column, final String content, final Object instance) {
-        setExcelRow(row, instance);
+    public Data createInstanceData() {
+        return new Data();
+    }
+
+    public void setCellInData(final int row, final int column, final String content, final Data data) {
+        setExcelRow(row, data);
         if (superClassFields != null) {
-            superClassFields.setCellInInstance(row, column, content, instance);
+            superClassFields.setCellInData(row, column, content, data);
         }
         if (!unknownFields.isEmpty() && unknownColumns.containsKey(column) && !content.isEmpty()) {
             for (final Field unknownField : unknownFields) {
-                try {
-                    final Object unknownInstance = unknownField.get(instance);
-                    if (unknownInstance == null) {
-                        final Map<String, String> map = new HashMap<>();
-                        unknownField.set(instance, map);
-                        map.put(unknownColumns.get(column), content);
-                    } else {
-                        final Map map = (Map) unknownInstance;
-                        map.put(unknownColumns.get(column), content);
-                    }
-
-                } catch (IllegalAccessException e) {
-                    throw new IllegalCastException("Could not read content of field " + unknownField.getName() + " on Object {" + instance + "}");
+                final Object unknownData = data.get(unknownField);
+                if (unknownData == null) {
+                    final Map<String, String> map = new HashMap<>();
+                    data.put(unknownField, map);
+                    map.put(unknownColumns.get(column), content);
+                } else {
+                    final Map map = (Map) unknownData;
+                    map.put(unknownColumns.get(column), content);
                 }
+
             }
         } else if (orderedFields.containsKey(column)) {
             final Field field = orderedFields.get(column);
@@ -143,47 +142,39 @@ public class ReadMappedFields {
             final Object o = casting.castValue(field, content, row, column, options);
             final Exception exception = casting.getException();
             if (exception != null && !excelParseException.isEmpty()){
-                setExcelError(column, content, instance, field, exception);
+                setExcelError(column, content, data, field, exception);
             }
-            setFieldData(field, o, instance);
+            data.put(field, o);
         } else {
             for (final Map.Entry<Field, ReadMappedFields> entry : rangeFields.entrySet()) {
                 final Field rangeField = entry.getKey();
-                try {
-                    Object rangeFieldInstance = rangeField.get(instance);
-                    if (rangeFieldInstance == null) {
-                        rangeFieldInstance = ReflectUtil.newInstanceOf(rangeField.getType());
-                        rangeField.set(instance, rangeFieldInstance);
-                    }
-                    entry.getValue().setCellInInstance(row, column, content, rangeFieldInstance);
-                } catch (IllegalAccessException e) {
-                    throw new IllegalCastException("Could not read content of field " + rangeField.getName() + " on Object {" + instance + "}");
+                Data rangeFieldData = (Data) data.get(rangeField);
+                if (rangeFieldData == null) {
+                    rangeFieldData = createInstanceData();
+                    data.put(rangeField, rangeFieldData);
                 }
+                entry.getValue().setCellInData(row, column, content, rangeFieldData);
             }
             for (final Map.Entry<Field, ReadMappedList> entry : listFields.entrySet()) {
                 final Field listField = entry.getKey();
-                try {
-                    List listFieldInstance = (List)listField.get(instance);
-                    if (listFieldInstance == null) {
-                        listFieldInstance = new ArrayList<>();
-                        listField.set(instance, listFieldInstance);
-                    }
-                    entry.getValue().setCellInList(row, column, content, listFieldInstance);
-                } catch (IllegalAccessException e) {
-                    throw new IllegalCastException("Could not read content of field " + listField.getName() + " on Object {" + instance + "}");
+                List<Data> listFieldData = (List<Data>) data.get(listField);
+                if (listFieldData == null) {
+                    listFieldData = new ArrayList<>();
+                    data.put(listField, listFieldData);
                 }
+                entry.getValue().setCellInList(row, column, content, listFieldData);
             }
         }
     }
 
     private List<Field> parseExcelWriteOnly(final List<Field> fields) {
-        final List<Field> withoutWriteOnly = new ArrayList<>(fields.size());
+        final List<Field> rest = new ArrayList<>(fields.size());
         for (final Field field : fields) {
             if (field.getAnnotation(ExcelWriteOnly.class) == null){
-                withoutWriteOnly.add(field);
+                rest.add(field);
             }
         }
-        return withoutWriteOnly;
+        return rest;
     }
 
     private List<Field> parseExcelRow(final List<Field> fields) {
@@ -192,7 +183,9 @@ public class ReadMappedFields {
             final ExcelRow annotation = field.getAnnotation(ExcelRow.class);
             if (annotation != null) {
                 this.excelRow.add(field);
-                field.setAccessible(true);
+                if (!field.isAccessible()) {
+                    field.setAccessible(true);
+                }
             } else {
                 rest.add(field);
             }
@@ -206,7 +199,9 @@ public class ReadMappedFields {
             final ExcelParseExceptions annotation = field.getAnnotation(ExcelParseExceptions.class);
             if (annotation != null) {
                 this.excelParseException.add(field);
-                field.setAccessible(true);
+                if (!field.isAccessible()) {
+                    field.setAccessible(true);
+                }
             } else {
                 rest.add(field);
             }
@@ -228,7 +223,9 @@ public class ReadMappedFields {
                     final String name = options.getFormatting().transform(options, possibleFieldName);
                     namedFields.put(name, field);
                 }
-                field.setAccessible(true);
+                if (!field.isAccessible()) {
+                    field.setAccessible(true);
+                }
             } else {
                 rest.add(field);
             }
@@ -246,7 +243,9 @@ public class ReadMappedFields {
         for (final Field field : fields) {
             if (field.getAnnotation(ExcelUnknownCells.class) != null && field.getType().isAssignableFrom(Map.class)) {
                 unknownFields.add(field);
-                field.setAccessible(true);
+                if (!field.isAccessible()) {
+                    field.setAccessible(true);
+                }
             } else {
                 rest.add(field);
             }
@@ -259,7 +258,9 @@ public class ReadMappedFields {
         for (final Field field : fields) {
             if (field.getAnnotation(ExcelCellRange.class) != null) {
                 rangeFields.put(field, new ReadMappedFields(field.getType(), options).parseEntity());
-                field.setAccessible(true);
+                if (!field.isAccessible()) {
+                    field.setAccessible(true);
+                }
             } else {
                 rest.add(field);
             }
@@ -272,9 +273,11 @@ public class ReadMappedFields {
         for (final Field field : fields) {
             final ExcelList annotation = field.getAnnotation(ExcelList.class);
             if (field.getType().isAssignableFrom(List.class) && annotation != null) {
-                final Class entity = (Class) ((ParameterizedTypeImpl) field.getGenericType()).getActualTypeArguments()[0];
+                final Class entity = (Class) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
                 listFields.put(field, new ReadMappedList(annotation, entity, options));
-                field.setAccessible(true);
+                if (!field.isAccessible()) {
+                    field.setAccessible(true);
+                }
             } else {
                 rest.add(field);
             }
@@ -288,7 +291,9 @@ public class ReadMappedFields {
             if (field.getAnnotation(ExcelCell.class) != null) {
                 final Integer excelOrder = field.getAnnotation(ExcelCell.class).value();
                 orderedFields.put(excelOrder, field);
-                field.setAccessible(true);
+                if (!field.isAccessible()) {
+                    field.setAccessible(true);
+                }
             } else {
                 rest.add(field);
             }
@@ -302,28 +307,15 @@ public class ReadMappedFields {
             : columnName;
     }
 
-    private void setFieldData(Field field, Object o, Object instance) {
-        try {
-            field.set(instance, o);
-        } catch (IllegalAccessException e) {
-            throw new IllegalCastException("Unexpected cast type {" + o + "} of field" + field.getName());
-        }
-    }
-
-    private <T> void setExcelRow(final int column, final T instance) {
+    private void setExcelRow(final int column, final Data data) {
         for (final Field field : excelRow) {
-            try {
-                field.setInt(instance, column);
-            } catch (IllegalAccessException e) {
-                throw new IllegalCastException("Could not set excel row number in field " + field.getName() + " on Object {" + instance + "}");
-            }
+            data.put(field, column);
         }
     }
 
     private void setExcelError(
-        final int column, final String content, final Object instance, final Field field, final Exception exception
+        final int column, final String content, final Data data, final Field field, final Exception exception
     ) {
-
         final ExcelCellName annotation = field.getAnnotation(ExcelCellName.class);
         final String key;
         if (annotation != null){
@@ -334,16 +326,12 @@ public class ReadMappedFields {
             return;
         }
         for (final Field errorField : excelParseException) {
-            try {
-                Map<String, ExcelParseException> map = (Map<String, ExcelParseException>) errorField.get(instance);
-                if (map == null){
-                    map = new HashMap<>();
-                    errorField.set(instance, map);
-                }
-                map.put(key, new ExcelParseException(exception, content, field.getName()));
-            } catch (IllegalAccessException e) {
-                throw new IllegalCastException("Could not set excel parse error in field " + errorField.getName() + " on Object {" + instance + "}");
+            Map<String, ExcelParseException> map = (Map<String, ExcelParseException>) data.get(errorField);
+            if (map == null){
+                map = new HashMap<>();
+                data.put(errorField, map);
             }
+            map.put(key, new ExcelParseException(exception, content, field.getName()));
         }
     }
 
