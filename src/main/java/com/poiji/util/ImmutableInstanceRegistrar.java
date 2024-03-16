@@ -1,6 +1,7 @@
 package com.poiji.util;
 
 import com.poiji.exception.PoijiException;
+import com.poiji.exception.PoijiInstantiationException;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -51,6 +52,6 @@ public class ImmutableInstanceRegistrar {
         }
         final String message = String.format("Use %s.register() to register empty instance for '%s' first",
                 ImmutableInstanceRegistrar.class.getName(), type.getName());
-        throw new PoijiException(message);
+        throw new PoijiInstantiationException(message, null);
     }
 }
