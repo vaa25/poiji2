@@ -3,7 +3,7 @@
 This is an advanced fork of https://github.com/ozlerhakan/poiji. +
 Many thanks to ozlerhakan for inspiration.
 
-Apache POI library required as dependency to work with xlsx and xls. Tested with dependency 'org.apache.poi:poi-ooxml:4.1.2'.
+Apache POI library required as dependency to work with xlsx and xls. Tested with dependency 'org.apache.poi:poi-ooxml:5.2.5'.
 
 In your Maven/Gradle project, first add the corresponding dependency:
 
@@ -14,7 +14,7 @@ In your Maven/Gradle project, first add the corresponding dependency:
     <dependency>
         <groupId>io.github.vaa25</groupId>
         <artifactId>poiji2</artifactId>
-        <version>1.4.0</version>
+        <version>1.4.1</version>
     </dependency>
     <dependency>
         <groupId>org.apache.poi</groupId>
@@ -29,7 +29,7 @@ In your Maven/Gradle project, first add the corresponding dependency:
 [source,groovy]
 ----
 dependencies {
-    implementation 'io.github.vaa25:poiji2:1.4.0'
+    implementation 'io.github.vaa25:poiji2:1.4.1'
     implementation 'org.apache.poi:poi-ooxml:5.2.5'
 }
 ----
@@ -51,3 +51,4 @@ Also:
 - Poiji2 can read lists in row (use `@ExcelList` on `List`)
 - Poiji2 can read and write huge xlsx files (see HugeTest.java)
 - Poiji2 (since v1.4.0) can work with immutable java classes (see IgnoreTest.java). lombok @Value and java records applicable also.
+- Poiji2 (since v1.4.1) can work with immutable java classes with many constructors (see ExcelConstructorTest.java). Apply @ExcelConstructor to choose one of.
