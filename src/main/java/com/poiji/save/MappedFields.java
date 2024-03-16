@@ -7,6 +7,8 @@ import com.poiji.annotation.ExcelUnknownCells;
 import com.poiji.bind.mapping.SheetNameExtractor;
 import com.poiji.exception.PoijiException;
 import com.poiji.option.PoijiOptions;
+import com.poiji.util.ReflectUtil;
+
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -50,14 +52,10 @@ public final class MappedFields {
                     final String name = field.getName();
                     orders.put(field, excelOrder);
                     names.put(field, name);
-                    if (!field.isAccessible()) {
-                        field.setAccessible(true);
-                    }
+                    ReflectUtil.setAccessible(field);
                 } else if (field.getAnnotation(ExcelUnknownCells.class) != null) {
                     unknownCells.add(field);
-                    if (!field.isAccessible()) {
-                        field.setAccessible(true);
-                    }
+                    ReflectUtil.setAccessible(field);
                 } else {
                     final ExcelCellName annotation = field.getAnnotation(ExcelCellName.class);
                     if (annotation != null) {
@@ -72,9 +70,7 @@ public final class MappedFields {
                             orders.put(field, order);
                         }
                         names.put(field, excelName);
-                        if (!field.isAccessible()) {
-                            field.setAccessible(true);
-                        }
+                        ReflectUtil.setAccessible(field);
                     }
                 }
             }

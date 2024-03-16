@@ -1,11 +1,8 @@
 package com.poiji.deserialize;
 
 import com.poiji.bind.Poiji;
+import com.poiji.deserialize.model.*;
 import com.poiji.util.ImmutableInstanceRegistrar;
-import com.poiji.deserialize.model.ListElement;
-import com.poiji.deserialize.model.ListElementImmutable;
-import com.poiji.deserialize.model.ListEntity;
-import com.poiji.deserialize.model.ListImmutable;
 import com.poiji.option.PoijiOptions;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -68,6 +65,40 @@ public class ReadExcelListTest {
 
         final PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings().headerCount(2).preferNullOverDefault(true).build();
         final List<ListImmutable> read = Poiji.fromExcel(new File(path), ListImmutable.class, options);
+        assertThat(read, equalTo(expected));
+    }
+
+    @Test
+    public void readConstructorProperties() {
+        final ListElementConstructorProperties person11 = new ListElementConstructorProperties(2, "test", ListElementConstructorProperties.Gender.male, 10);
+        final ListElementConstructorProperties person12 = new ListElementConstructorProperties(2, "gogo", ListElementConstructorProperties.Gender.female,20);
+        final ListElementConstructorProperties person21 = new ListElementConstructorProperties(3, "abc", ListElementConstructorProperties.Gender.male, 30);
+        final ListElementConstructorProperties person22 = new ListElementConstructorProperties(3, "vivi", ListElementConstructorProperties.Gender.female, 40);
+        final ListElementConstructorProperties person23 = new ListElementConstructorProperties(3, "vava", ListElementConstructorProperties.Gender.female, 40);
+        final List<ListConstructorProperties> expected = asList(
+                new ListConstructorProperties(1, asList(person11, person12)),
+                new ListConstructorProperties(2, asList(person21, person22, person23))
+        );
+
+        final PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings().headerCount(2).preferNullOverDefault(true).build();
+        final List<ListConstructorProperties> read = Poiji.fromExcel(new File(path), ListConstructorProperties.class, options);
+        assertThat(read, equalTo(expected));
+    }
+
+    @Test
+    public void readConstructorProperties2() {
+        final ListElementConstructorProperties2 person11 = new ListElementConstructorProperties2(2, "test", ListElementConstructorProperties2.Gender.male, 10, '0');
+        final ListElementConstructorProperties2 person12 = new ListElementConstructorProperties2(2, "gogo", ListElementConstructorProperties2.Gender.female,20, '0');
+        final ListElementConstructorProperties2 person21 = new ListElementConstructorProperties2(3, "abc", ListElementConstructorProperties2.Gender.male, 30, '0');
+        final ListElementConstructorProperties2 person22 = new ListElementConstructorProperties2(3, "vivi", ListElementConstructorProperties2.Gender.female, 40, '0');
+        final ListElementConstructorProperties2 person23 = new ListElementConstructorProperties2(3, "vava", ListElementConstructorProperties2.Gender.female, 40, '0');
+        final List<ListConstructorProperties2> expected = asList(
+                new ListConstructorProperties2(1, asList(person11, person12)),
+                new ListConstructorProperties2(2, asList(person21, person22, person23))
+        );
+
+        final PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings().headerCount(2).preferNullOverDefault(true).build();
+        final List<ListConstructorProperties2> read = Poiji.fromExcel(new File(path), ListConstructorProperties2.class, options);
         assertThat(read, equalTo(expected));
     }
 

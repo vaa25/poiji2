@@ -3,6 +3,7 @@ package com.poiji.util;
 import com.poiji.annotation.ExcelCellRange;
 import com.poiji.bind.mapping.Data;
 import com.poiji.exception.IllegalCastException;
+import com.poiji.exception.PoijiException;
 import com.poiji.exception.PoijiInstantiationException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
@@ -39,15 +40,14 @@ public class ReflectUtil {
 
     public static <T> T newInstanceOf(Class<?> type, Data data) {
         try {
-            final Constructor<?> constructor = type.getDeclaredConstructors()[0];
-            if (!constructor.isAccessible()) {
-                constructor.setAccessible(true);
-            }
+            final Constructor<?> constructor = ConstructorSelector.selectConstructor(type);
             if (constructor.getParameterCount() == 0) {
                 return createInstanceUsingDefaultConstructor(data, constructor);
             } else {
                 return createInstanceUsingParameterizedConstructor(data, constructor);
             }
+        } catch (PoijiInstantiationException exception) {
+            throw exception;
         } catch (Exception ex) {
             throw new PoijiInstantiationException("Cannot create a new instance of " + type.getName(), ex);
         }
@@ -158,12 +158,16 @@ public class ReflectUtil {
 
     public static void setFieldData(Field field, Object o, Object instance) {
         try {
-            if (!field.isAccessible()) {
-                field.setAccessible(true);
-            }
+            setAccessible(field);
             field.set(instance, o);
         } catch (IllegalAccessException e) {
             throw new IllegalCastException("Unexpected cast type {" + o + "} of field" + field.getName());
+        }
+    }
+
+    public static void setAccessible(Field field) {
+        if (!field.isAccessible()) {
+            field.setAccessible(true);
         }
     }
 }

@@ -2,6 +2,7 @@ package com.poiji.util;
 
 import com.poiji.exception.PoijiInstantiationException;
 
+import java.beans.ConstructorProperties;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -18,40 +19,85 @@ class ConstructorFieldMapper {
     }
 
     private static Object[] getConstructorMapping(Constructor<?> constructor) {
-        final Class<?> entity = constructor.getDeclaringClass();
-        final Class<?>[] parameterTypes = constructor.getParameterTypes();
-        final Object[] defaults = fieldDefaultsMapping.computeIfAbsent(constructor, ignored -> getDefaultValues(parameterTypes));
-        final Object[] constructorMapping = new Object[parameterTypes.length];
-        for (int i = 0; i < parameterTypes.length; i++) {
-            final Object[] clone = defaults.clone();
-            final Class<?> parameterType = parameterTypes[i];
-            final Object example = ImmutableInstanceRegistrar.getEmptyInstance(parameterType);
-            clone[i] = example;
-            try {
-                final Object instance = constructor.newInstance(clone);
-                final Field[] fields = entity.getDeclaredFields();
+        final Object[] constructorMapping = new Object[constructor.getParameterCount()];
+        mapFieldsWithConstructorProperties(constructor, constructorMapping);
+        findNotMappedFieldsWithExamining(constructor, constructorMapping);
+        fillNotMappedParametersWithDefaults(constructor, constructorMapping);
+        return constructorMapping;
+    }
+
+    /**
+     * ConstructorProperties is used by lombok. It allows to map any custom fields easy without examining.
+     */
+    private static Object[] mapFieldsWithConstructorProperties(Constructor<?> constructor, Object[] constructorMapping) {
+        final ConstructorProperties constructorProperties = constructor.getAnnotation(ConstructorProperties.class);
+        if (constructorProperties != null) {
+            final Field[] fields = constructor.getDeclaringClass().getDeclaredFields();
+            final String[] parameterNames = constructorProperties.value();
+            final Class<?>[] parameterTypes = constructor.getParameterTypes();
+            for (int i = 0; i < parameterNames.length; i++) {
+                final String parameterName = parameterNames[i];
                 for (Field field : fields) {
-                    if (!field.isAccessible()) {
-                        field.setAccessible(true);
-                    }
-                    try {
-                        if (isFieldHasExampleValue(field, instance, example)) {
-                            constructorMapping[i] = field;
-                            break;
-                        }
-                    } catch (IllegalAccessException e) {
-                        throw new PoijiInstantiationException("Can't get field " + field, e);
+                    if (field.getName().equals(parameterName) && field.getType() == parameterTypes[i]) {
+                        ReflectUtil.setAccessible(field);
+                        constructorMapping[i] = field;
+                        break;
                     }
                 }
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                throw new PoijiInstantiationException("Can't create instance " + entity, e);
-            }
-            if (constructorMapping[i] == null) {
-                constructorMapping[i] = defaults[i];
             }
         }
         return constructorMapping;
+    }
 
+    /**
+     * The only way to find mapping between constructor parameters and instance fields is to pass special value
+     * into constructor and look it up in every field in instance.
+     * Knowing what parameter was passed and what field was found in we can define one mapping.
+     */
+    private static Object[] findNotMappedFieldsWithExamining(Constructor<?> constructor, Object[] constructorMapping) {
+        final Class<?> entity = constructor.getDeclaringClass();
+        final Class<?>[] parameterTypes = constructor.getParameterTypes();
+        final Object[] defaultConstructorParameters = fieldDefaultsMapping.computeIfAbsent(constructor, ignored -> getDefaultValues(parameterTypes));
+        final Field[] fields = entity.getDeclaredFields();
+        for (int i = 0; i < parameterTypes.length; i++) {
+            if (constructorMapping[i] == null) {
+                final Object[] instanceConstructorParameters = defaultConstructorParameters.clone();
+                final Class<?> parameterType = parameterTypes[i];
+                final Object parameterToExamine = ImmutableInstanceRegistrar.getEmptyInstance(parameterType);
+                instanceConstructorParameters[i] = parameterToExamine;
+                try {
+                    final Object instance = constructor.newInstance(instanceConstructorParameters);
+                    for (Field field : fields) {
+                        ReflectUtil.setAccessible(field);
+                        try {
+                            if (isFieldHasExampleValue(field, instance, parameterToExamine)) {
+                                constructorMapping[i] = field;
+                                break;
+                            }
+                        } catch (IllegalAccessException e) {
+                            throw new PoijiInstantiationException("Can't get field " + field, e);
+                        }
+                    }
+                } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                    throw new PoijiInstantiationException("Can't create instance " + entity, e);
+                }
+            }
+        }
+        return constructorMapping;
+    }
+
+    /**
+     * Sometimes constructor can have parameter that not corresponds to any field.
+     * We have to fill it anyway to construct instance successfully.
+     */
+    private static Object[] fillNotMappedParametersWithDefaults(Constructor<?> constructor, Object[] constructorMapping) {
+        final Object[] defaultConstructorParameters = fieldDefaultsMapping.computeIfAbsent(constructor, ignored -> getDefaultValues(constructor.getParameterTypes()));
+        for (int i = 0; i < constructorMapping.length; i++) {
+            if (constructorMapping[i] == null) {
+                constructorMapping[i] = defaultConstructorParameters[i];
+            }
+        }
+        return constructorMapping;
     }
 
     private static boolean isFieldHasExampleValue(Field field, Object instance, Object example) throws IllegalAccessException {
