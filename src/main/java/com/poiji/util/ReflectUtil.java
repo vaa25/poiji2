@@ -158,12 +158,16 @@ public class ReflectUtil {
 
     public static void setFieldData(Field field, Object o, Object instance) {
         try {
-            if (!field.isAccessible()) {
-                field.setAccessible(true);
-            }
+            setAccessible(field);
             field.set(instance, o);
         } catch (IllegalAccessException e) {
             throw new IllegalCastException("Unexpected cast type {" + o + "} of field" + field.getName());
+        }
+    }
+
+    public static void setAccessible(Field field) {
+        if (!field.isAccessible()) {
+            field.setAccessible(true);
         }
     }
 }

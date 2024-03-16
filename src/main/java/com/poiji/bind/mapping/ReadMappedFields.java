@@ -183,9 +183,7 @@ public class ReadMappedFields {
             final ExcelRow annotation = field.getAnnotation(ExcelRow.class);
             if (annotation != null) {
                 this.excelRow.add(field);
-                if (!field.isAccessible()) {
-                    field.setAccessible(true);
-                }
+                ReflectUtil.setAccessible(field);
             } else {
                 rest.add(field);
             }
@@ -199,9 +197,7 @@ public class ReadMappedFields {
             final ExcelParseExceptions annotation = field.getAnnotation(ExcelParseExceptions.class);
             if (annotation != null) {
                 this.excelParseException.add(field);
-                if (!field.isAccessible()) {
-                    field.setAccessible(true);
-                }
+                ReflectUtil.setAccessible(field);
             } else {
                 rest.add(field);
             }
@@ -223,9 +219,7 @@ public class ReadMappedFields {
                     final String name = options.getFormatting().transform(options, possibleFieldName);
                     namedFields.put(name, field);
                 }
-                if (!field.isAccessible()) {
-                    field.setAccessible(true);
-                }
+                ReflectUtil.setAccessible(field);
             } else {
                 rest.add(field);
             }
@@ -243,9 +237,7 @@ public class ReadMappedFields {
         for (final Field field : fields) {
             if (field.getAnnotation(ExcelUnknownCells.class) != null && field.getType().isAssignableFrom(Map.class)) {
                 unknownFields.add(field);
-                if (!field.isAccessible()) {
-                    field.setAccessible(true);
-                }
+                ReflectUtil.setAccessible(field);
             } else {
                 rest.add(field);
             }
@@ -258,9 +250,7 @@ public class ReadMappedFields {
         for (final Field field : fields) {
             if (field.getAnnotation(ExcelCellRange.class) != null) {
                 rangeFields.put(field, new ReadMappedFields(field.getType(), options).parseEntity());
-                if (!field.isAccessible()) {
-                    field.setAccessible(true);
-                }
+                ReflectUtil.setAccessible(field);
             } else {
                 rest.add(field);
             }
@@ -275,9 +265,7 @@ public class ReadMappedFields {
             if (field.getType().isAssignableFrom(List.class) && annotation != null) {
                 final Class entity = (Class) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
                 listFields.put(field, new ReadMappedList(annotation, entity, options));
-                if (!field.isAccessible()) {
-                    field.setAccessible(true);
-                }
+                ReflectUtil.setAccessible(field);
             } else {
                 rest.add(field);
             }
@@ -291,9 +279,7 @@ public class ReadMappedFields {
             if (field.getAnnotation(ExcelCell.class) != null) {
                 final Integer excelOrder = field.getAnnotation(ExcelCell.class).value();
                 orderedFields.put(excelOrder, field);
-                if (!field.isAccessible()) {
-                    field.setAccessible(true);
-                }
+                ReflectUtil.setAccessible(field);
             } else {
                 rest.add(field);
             }
