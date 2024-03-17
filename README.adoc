@@ -14,7 +14,7 @@ In your Maven/Gradle project, first add the corresponding dependency:
     <dependency>
         <groupId>io.github.vaa25</groupId>
         <artifactId>poiji2</artifactId>
-        <version>1.4.1</version>
+        <version>1.5.0</version>
     </dependency>
     <dependency>
         <groupId>org.apache.poi</groupId>
@@ -29,7 +29,7 @@ In your Maven/Gradle project, first add the corresponding dependency:
 [source,groovy]
 ----
 dependencies {
-    implementation 'io.github.vaa25:poiji2:1.4.1'
+    implementation 'io.github.vaa25:poiji2:1.5.0'
     implementation 'org.apache.poi:poi-ooxml:5.2.5'
 }
 ----
@@ -52,3 +52,4 @@ Also:
 - Poiji2 can read and write huge xlsx files (see HugeTest.java)
 - Poiji2 (since v1.4.0) can work with immutable java classes (see IgnoreTest.java). lombok @Value and java records applicable also.
 - Poiji2 (since v1.4.1) can work with immutable java classes with many constructors (see ExcelConstructorTest.java). Apply @ExcelConstructor to choose one of.
+- Poiji2 (since v1.5.0) can read sheet names (see ReadSheetNamesTest.java).

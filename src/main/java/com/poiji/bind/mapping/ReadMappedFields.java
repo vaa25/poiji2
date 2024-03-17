@@ -1,26 +1,15 @@
 package com.poiji.bind.mapping;
 
-import com.poiji.annotation.ExcelCell;
-import com.poiji.annotation.ExcelCellName;
-import com.poiji.annotation.ExcelCellRange;
-import com.poiji.annotation.ExcelList;
-import com.poiji.annotation.ExcelParseExceptions;
-import com.poiji.annotation.ExcelRow;
-import com.poiji.annotation.ExcelUnknownCells;
-import com.poiji.annotation.ExcelWriteOnly;
+import com.poiji.annotation.*;
 import com.poiji.config.Casting;
 import com.poiji.exception.ExcelParseException;
 import com.poiji.option.PoijiOptions;
 import com.poiji.util.AnnotationUtil;
 import com.poiji.util.ReflectUtil;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static com.poiji.annotation.ExcelCellName.ABSENT_ORDER;
 import static java.util.Arrays.asList;
@@ -127,7 +116,7 @@ public class ReadMappedFields {
             for (final Field unknownField : unknownFields) {
                 final Object unknownData = data.get(unknownField);
                 if (unknownData == null) {
-                    final Map<String, String> map = new HashMap<>();
+                    final Map<String, String> map = ReflectUtil.newMap(unknownField);
                     data.put(unknownField, map);
                     map.put(unknownColumns.get(column), content);
                 } else {
@@ -235,7 +224,7 @@ public class ReadMappedFields {
     private List<Field> parseUnknownCells(final List<Field> fields) {
         final List<Field> rest = new ArrayList<>(fields.size());
         for (final Field field : fields) {
-            if (field.getAnnotation(ExcelUnknownCells.class) != null && field.getType().isAssignableFrom(Map.class)) {
+            if (field.isAnnotationPresent(ExcelUnknownCells.class) && Map.class.isAssignableFrom(field.getType())) {
                 unknownFields.add(field);
                 ReflectUtil.setAccessible(field);
             } else {

@@ -3,11 +3,12 @@ package com.poiji.deserialize;
 import com.poiji.bind.Poiji;
 import com.poiji.deserialize.model.byname.OrgWithUnknownCellsByName;
 import com.poiji.option.PoijiOptions;
-import java.io.File;
-import java.util.List;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+
+import java.io.File;
+import java.util.List;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
@@ -46,16 +47,16 @@ public class CaseInsensitiveTest {
             .filter(org -> org.getId().equals("CrEaTe"))
             .findFirst()
             .get();
-        assertThat(firstRow.getUnknownCells().size(), is(1));
-        assertThat(firstRow.getUnknownCells().get("region"), is("EMEA"));
+        assertThat(firstRow.getSortedUnknownCells().size(), is(1));
+        assertThat(firstRow.getSortedUnknownCells().get("region"), is("EMEA"));
 
 
         OrgWithUnknownCellsByName secondRow = organisations.stream()
             .filter(org -> org.getId().equals("8d9e6430-8626-4556-8004-079085d2df2d"))
             .findFirst()
             .get();
-        assertThat(secondRow.getUnknownCells().size(), is(1));
-        assertThat(secondRow.getUnknownCells().get("region"), is("NA"));
+        assertThat(secondRow.getSortedUnknownCells().size(), is(1));
+        assertThat(secondRow.getSortedUnknownCells().get("region"), is("NA"));
     }
 
 }

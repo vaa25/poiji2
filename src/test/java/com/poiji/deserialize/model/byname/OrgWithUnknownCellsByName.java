@@ -5,6 +5,7 @@ import com.poiji.annotation.ExcelRow;
 import com.poiji.annotation.ExcelUnknownCells;
 
 import java.util.Map;
+import java.util.TreeMap;
 
 public class OrgWithUnknownCellsByName {
 
@@ -23,10 +24,13 @@ public class OrgWithUnknownCellsByName {
     private String externalId;
 
     @ExcelUnknownCells
-    private Map<String, String> unknownCells;
+    private TreeMap<String, String> sortedUnknownCells;
 
-    public Map<String, String> getUnknownCells() {
-        return unknownCells;
+    @ExcelUnknownCells
+    private Map<String, String> linkedUnknownCells;
+
+    public Map<String, String> getSortedUnknownCells() {
+        return sortedUnknownCells;
     }
 
     @ExcelCellName(HEADER_ORGANISATION_NAME)
@@ -73,5 +77,9 @@ public class OrgWithUnknownCellsByName {
 
     public void setCustomerExternalId(String customerExternalId) {
         this.customerExternalId = customerExternalId;
+    }
+
+    public Map<String, String> getLinkedUnknownCells() {
+        return linkedUnknownCells;
     }
 }

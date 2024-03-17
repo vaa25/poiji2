@@ -10,10 +10,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ReflectUtil {
     public static <T> T newInstanceOf(Class<T> type) {
@@ -182,5 +179,13 @@ public class ReflectUtil {
         } catch (NoSuchFieldException e) {
             throw new PoijiException(e.getMessage(), e);
         }
+    }
+
+    public static <K, V> Map<K, V> newMap(Field field) {
+        final Class<?> type = field.getType();
+        if (type == Map.class) {
+            return new LinkedHashMap<>();
+        }
+        return (Map<K, V>) newInstanceOf(type);
     }
 }
