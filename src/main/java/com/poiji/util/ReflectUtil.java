@@ -5,6 +5,7 @@ import com.poiji.bind.mapping.Data;
 import com.poiji.exception.IllegalCastException;
 import com.poiji.exception.PoijiException;
 import com.poiji.exception.PoijiInstantiationException;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -168,6 +169,18 @@ public class ReflectUtil {
     public static void setAccessible(Field field) {
         if (!field.isAccessible()) {
             field.setAccessible(true);
+        }
+    }
+
+    public static <T> T getFieldData(String fieldName, Object instance) {
+        try {
+            final Field field = instance.getClass().getDeclaredField(fieldName);
+            setAccessible(field);
+            return (T) field.get(instance);
+        } catch (IllegalAccessException e) {
+            throw new IllegalCastException("Unexpected cast type {");
+        } catch (NoSuchFieldException e) {
+            throw new PoijiException(e.getMessage(), e);
         }
     }
 }

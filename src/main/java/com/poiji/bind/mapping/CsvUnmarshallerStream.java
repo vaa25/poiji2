@@ -4,10 +4,12 @@ import com.poiji.bind.PoijiInputStream;
 import com.poiji.bind.Unmarshaller;
 import com.poiji.exception.PoijiException;
 import com.poiji.option.PoijiOptions;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import com.poiji.util.ReflectUtil;
+
+import java.io.*;
+import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -47,6 +49,20 @@ public final class CsvUnmarshallerStream implements Unmarshaller {
         }
     }
 
+    /**
+     * Excel uses file name as sheet name for CSV format.
+     */
+    @Override
+    public List<String> readSheetNames() {
+        final InputStream stream = poijiStream.stream();
+        if (stream instanceof FileInputStream) {
+            final String path = ReflectUtil.getFieldData("path", stream);
+            final String fileName = Paths.get(path).getFileName().toString();
+            return Collections.singletonList(fileName.substring(0, fileName.lastIndexOf(".")));
+        }
+        return options.preferNullOverDefault() ? null : Collections.emptyList();
+    }
+
     private static class BomInputStream extends InputStream{
 
         private final InputStream inner;
@@ -73,7 +89,7 @@ public final class CsvUnmarshallerStream implements Unmarshaller {
         }
 
         @Override
-        public int read() throws IOException {
+        public int read() {
             return 0;
         }
 

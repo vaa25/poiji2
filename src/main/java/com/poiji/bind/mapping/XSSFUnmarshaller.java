@@ -4,18 +4,6 @@ import com.poiji.bind.Unmarshaller;
 import com.poiji.exception.PoijiException;
 import com.poiji.option.PoijiOptions;
 import com.poiji.save.TransposeUtil;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.Spliterator;
-import java.util.Spliterators;
-import java.util.function.Consumer;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
-import javax.xml.parsers.ParserConfigurationException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.poifs.filesystem.DocumentFactoryHelper;
@@ -34,6 +22,15 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
 import static org.apache.poi.openxml4j.opc.PackageAccess.READ_WRITE;
 
 /**
@@ -47,78 +44,84 @@ abstract class XSSFUnmarshaller implements Unmarshaller {
         this.options = options;
     }
 
-    protected <T> void unmarshal0(Class<T> type, Consumer<? super T> consumer, OPCPackage open)
-        throws ParserConfigurationException, IOException, SAXException, OpenXML4JException
-    {
-        if (options.getTransposed()) {
-            if (open.getPackageAccess() == READ_WRITE) {
-                final XSSFWorkbook workbook = new XSSFWorkbook(open);
-                TransposeUtil.transpose(workbook);
-                workbook.write(new OutputStream() {
-                    @Override
-                    public void write(final int b) {
+    @Override
+    public <T> void unmarshal(Class<T> type, Consumer<? super T> consumer) {
+        openFileAndExecute(opcPackage -> unmarshal0(type, consumer, opcPackage));
+    }
+
+    protected <T> void unmarshal0(Class<T> type, Consumer<? super T> consumer, OPCPackage open) {
+        try {
+            if (options.getTransposed()) {
+                if (open.getPackageAccess() == READ_WRITE) {
+                    final XSSFWorkbook workbook = new XSSFWorkbook(open);
+                    TransposeUtil.transpose(workbook);
+                    workbook.write(new OutputStream() {
+                        @Override
+                        public void write(final int b) {
+                        }
+                    });
+                } else {
+                    throw new UnsupportedOperationException("Can't apply transposition for streamed XLSX source");
+                }
+            }
+            ReadOnlySharedStringsTable readOnlySharedStringsTable = new ReadOnlySharedStringsTable(open);
+            XSSFReader workbookReader = new XSSFReader(open);
+            StylesTable styles = workbookReader.getStylesTable();
+            XMLReader reader = XMLHelper.newXMLReader();
+
+            InputSource is = new InputSource(workbookReader.getWorkbookData());
+
+            reader.setContentHandler(new WorkBookContentHandler(options));
+            reader.parse(is);
+
+            WorkBookContentHandler wbch = (WorkBookContentHandler) reader.getContentHandler();
+            List<WorkBookSheet> sheets = wbch.getSheets();
+            if (sheets.isEmpty()) {
+                throw new PoijiException("no excel sheets found");
+            }
+            PoijiNumberFormat poijiNumberFormat = options.getPoijiNumberFormat();
+            if (poijiNumberFormat != null) {
+                poijiNumberFormat.overrideExcelNumberFormats(styles);
+            }
+
+            SheetIterator iter = (SheetIterator) workbookReader.getSheetsData();
+            int sheetCounter = 0;
+
+            Optional<String> maybeSheetName = SheetNameExtractor.getSheetName(type, options);
+
+            if (!maybeSheetName.isPresent()) {
+                int requestedIndex = options.sheetIndex();
+                int nonHiddenSheetIndex = 0;
+                while (iter.hasNext()) {
+                    try (InputStream stream = iter.next()) {
+                        WorkBookSheet wbs = sheets.get(sheetCounter);
+                        if (wbs.getState().equals("visible")) {
+                            if (nonHiddenSheetIndex == requestedIndex) {
+                                processSheet(styles, reader, readOnlySharedStringsTable, type, stream, consumer);
+                                return;
+                            }
+                            nonHiddenSheetIndex++;
+                        }
                     }
-                });
+                    sheetCounter++;
+                }
             } else {
-                throw new UnsupportedOperationException("Can't apply transposition for streamed XLSX source");
-            }
-        }
-
-        ReadOnlySharedStringsTable readOnlySharedStringsTable = new ReadOnlySharedStringsTable(open);
-        XSSFReader workbookReader = new XSSFReader(open);
-        StylesTable styles = workbookReader.getStylesTable();
-        XMLReader reader = XMLHelper.newXMLReader();
-
-        InputSource is = new InputSource(workbookReader.getWorkbookData());
-
-        reader.setContentHandler(new WorkBookContentHandler(options));
-        reader.parse(is);
-
-        WorkBookContentHandler wbch = (WorkBookContentHandler) reader.getContentHandler();
-        List<WorkBookSheet> sheets = wbch.getSheets();
-        if (sheets.isEmpty()) {
-            throw new PoijiException("no excel sheets found");
-        }
-        PoijiNumberFormat poijiNumberFormat = options.getPoijiNumberFormat();
-        if (poijiNumberFormat != null) {
-            poijiNumberFormat.overrideExcelNumberFormats(styles);
-        }
-
-        SheetIterator iter = (SheetIterator) workbookReader.getSheetsData();
-        int sheetCounter = 0;
-
-        Optional<String> maybeSheetName = SheetNameExtractor.getSheetName(type, options);
-
-        if (!maybeSheetName.isPresent()) {
-            int requestedIndex = options.sheetIndex();
-            int nonHiddenSheetIndex = 0;
-            while (iter.hasNext()) {
-                try (InputStream stream = iter.next()) {
-                    WorkBookSheet wbs = sheets.get(sheetCounter);
-                    if (wbs.getState().equals("visible")) {
-                        if (nonHiddenSheetIndex == requestedIndex) {
-                            processSheet(styles, reader, readOnlySharedStringsTable, type, stream, consumer);
-                            return;
-                        }
-                        nonHiddenSheetIndex++;
-                    }
-                }
-                sheetCounter++;
-            }
-        } else {
-            String sheetName = maybeSheetName.get();
-            while (iter.hasNext()) {
-                try (InputStream stream = iter.next()) {
-                    WorkBookSheet wbs = sheets.get(sheetCounter);
-                    if (wbs.getState().equals("visible")) {
-                        if (iter.getSheetName().equalsIgnoreCase(sheetName)) {
-                            processSheet(styles, reader, readOnlySharedStringsTable, type, stream, consumer);
-                            return;
+                String sheetName = maybeSheetName.get();
+                while (iter.hasNext()) {
+                    try (InputStream stream = iter.next()) {
+                        WorkBookSheet wbs = sheets.get(sheetCounter);
+                        if (wbs.getState().equals("visible")) {
+                            if (iter.getSheetName().equalsIgnoreCase(sheetName)) {
+                                processSheet(styles, reader, readOnlySharedStringsTable, type, stream, consumer);
+                                return;
+                            }
                         }
                     }
+                    sheetCounter++;
                 }
-                sheetCounter++;
             }
+        } catch (IOException | OpenXML4JException | ParserConfigurationException | SAXException e) {
+            throw new PoijiException("Problem occurred while reading data: " + e.getMessage(), e);
         }
     }
 
@@ -268,15 +271,13 @@ abstract class XSSFUnmarshaller implements Unmarshaller {
 
     }
 
-    protected final <T> void listOfEncryptedItems(Class<T> type, Consumer<? super T> consumer, POIFSFileSystem fs) throws IOException {
-        InputStream stream = DocumentFactoryHelper.getDecryptedStream(fs, options.getPassword());
-
-        try (OPCPackage open = OPCPackage.open(stream)) {
-            unmarshal0(type, consumer, open);
-
-        } catch (ParserConfigurationException | SAXException | IOException | OpenXML4JException e) {
-            IOUtils.closeQuietly(fs);
-            throw new PoijiException("Problem occurred while reading data", e);
+    protected final void applyInEncryptedOpcPackage(Consumer<OPCPackage> process, POIFSFileSystem fileSystem) {
+        try (InputStream stream = DocumentFactoryHelper.getDecryptedStream(fileSystem, options.getPassword());
+             OPCPackage open = OPCPackage.open(stream)) {
+            process.accept(open);
+        } catch (IOException | OpenXML4JException e) {
+            IOUtils.closeQuietly(fileSystem);
+            throw new PoijiException("Problem occurred while reading data: " + e.getMessage(), e);
         }
     }
 
@@ -289,6 +290,24 @@ abstract class XSSFUnmarshaller implements Unmarshaller {
         } catch (ParserConfigurationException | SAXException | IOException | OpenXML4JException e) {
             IOUtils.closeQuietly(fs);
             throw new PoijiException("Problem occurred while reading data", e);
+        }
+    }
+
+    protected abstract void openFileAndExecute(Consumer<OPCPackage> process);
+
+    @Override
+    public List<String> readSheetNames() {
+        final List<String> result = new ArrayList<>();
+        openFileAndExecute(opcPackage -> readSheetNames(opcPackage, result));
+        return result;
+    }
+
+    private void readSheetNames(OPCPackage opcPackage, List<String> result) {
+        try {
+            final XSSFWorkbook workbook = new XSSFWorkbook(opcPackage);
+            workbook.forEach(sheet -> result.add(sheet.getSheetName()));
+        } catch (IOException e) {
+            throw new PoijiException("Problem occurred while reading data: " + e.getMessage(), e);
         }
     }
 
