@@ -1,4 +1,4 @@
-"Organisation ID","Customer External ID","Organisation External ID","Organisation Name","Region"
-,,,,
-"CrEaTe","customerOrgExt","createOrgExt","createOrg","EMEA"
-"8d9e6430-8626-4556-8004-079085d2df2d","customerOrgExt","updateOrgExt","updateOrg","NA"
+Organisation ID,Customer External ID,Organisation External ID,Organisation Name,Region,UnknownName3,UnknownName1,UnknownName2
+,,,,,,,
+CrEaTe,customerOrgExt,createOrgExt,createOrg,EMEA,UnknownValue31,UnknownValue11,UnknownValue21
+8d9e6430-8626-4556-8004-079085d2df2d,customerOrgExt,updateOrgExt,updateOrg,NA,UnknownValue32,UnknownValue12,UnknownValue22

@@ -5,6 +5,8 @@ import com.poiji.exception.InvalidExcelFileExtension;
 import com.poiji.exception.PoijiExcelType;
 import com.poiji.exception.PoijiException;
 import com.poiji.option.PoijiOptions;
+import org.apache.poi.ss.usermodel.Sheet;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -13,7 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
-import org.apache.poi.ss.usermodel.Sheet;
 
 public class FromExcel<T> {
 
@@ -42,6 +43,12 @@ public class FromExcel<T> {
         return result;
     }
 
+    public List<String> readSheetNames() {
+        validateSource();
+        validateOptions();
+        return source.getDeserializer(options).readSheetNames();
+    }
+
     public Stream<T> toStream() {
         validate();
         final Stream<T> stream = source.getDeserializer(options).stream(javaType);
@@ -53,14 +60,26 @@ public class FromExcel<T> {
     }
 
     private void validate() {
-        if (source == null) {
-            throw new PoijiException("Source must be set");
-        }
+        validateSource();
+        validateJavaType();
+        validateOptions();
+    }
+
+    private void validateJavaType() {
         if (javaType == null) {
             throw new PoijiException("Class must be set");
         }
+    }
+
+    private void validateOptions() {
         if (options == null){
             options = PoijiOptions.PoijiOptionsBuilder.settings().build();
+        }
+    }
+
+    private void validateSource() {
+        if (source == null) {
+            throw new PoijiException("Source must be set");
         }
     }
 

@@ -1,5 +1,6 @@
 package com.poiji.bind;
 
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -11,4 +12,6 @@ public interface Unmarshaller {
     <T> void unmarshal(Class<T> type, Consumer<? super T> consumer);
 
     <T> Stream<T> stream(Class<T> type);
+
+    List<String> readSheetNames();
 }

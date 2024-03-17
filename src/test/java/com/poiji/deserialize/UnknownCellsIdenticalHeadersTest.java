@@ -4,12 +4,13 @@ import com.poiji.bind.Poiji;
 import com.poiji.deserialize.model.byid.OrgWithUnknownCells;
 import com.poiji.deserialize.model.byname.OrgWithUnknownCellsByName;
 import com.poiji.option.PoijiOptions;
-import java.io.File;
-import java.util.Arrays;
-import java.util.List;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+
+import java.io.File;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -50,18 +51,18 @@ public class UnknownCellsIdenticalHeadersTest {
                 .filter(org -> org.getId().equals("CrEaTe"))
                 .findFirst()
                 .get();
-        assertThat(firstRow.getUnknownCells().size(), is(2));
-        assertThat(firstRow.getUnknownCells().get("Tag"), is("testTag"));
-        assertThat(firstRow.getUnknownCells().get("Tag@5"), is("rndTag"));
+        assertThat(firstRow.getSortedUnknownCells().size(), is(2));
+        assertThat(firstRow.getSortedUnknownCells().get("Tag"), is("testTag"));
+        assertThat(firstRow.getSortedUnknownCells().get("Tag@5"), is("rndTag"));
 
 
         OrgWithUnknownCellsByName secondRow = organisations.stream()
                 .filter(org -> org.getId().equals("8d9e6430-8626-4556-8004-079085d2df2d"))
                 .findFirst()
                 .get();
-        assertThat(secondRow.getUnknownCells().size(), is(2));
-        assertThat(secondRow.getUnknownCells().get("Tag"), is("testTag2"));
-        assertThat(secondRow.getUnknownCells().get("Tag@5"), is("rndTag2"));
+        assertThat(secondRow.getSortedUnknownCells().size(), is(2));
+        assertThat(secondRow.getSortedUnknownCells().get("Tag"), is("testTag2"));
+        assertThat(secondRow.getSortedUnknownCells().get("Tag@5"), is("rndTag2"));
     }
 
     @Test

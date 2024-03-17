@@ -5,14 +5,12 @@ import com.poiji.bind.mapping.Data;
 import com.poiji.exception.IllegalCastException;
 import com.poiji.exception.PoijiException;
 import com.poiji.exception.PoijiInstantiationException;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ReflectUtil {
     public static <T> T newInstanceOf(Class<T> type) {
@@ -169,5 +167,25 @@ public class ReflectUtil {
         if (!field.isAccessible()) {
             field.setAccessible(true);
         }
+    }
+
+    public static <T> T getFieldData(String fieldName, Object instance) {
+        try {
+            final Field field = instance.getClass().getDeclaredField(fieldName);
+            setAccessible(field);
+            return (T) field.get(instance);
+        } catch (IllegalAccessException e) {
+            throw new IllegalCastException("Unexpected cast type {");
+        } catch (NoSuchFieldException e) {
+            throw new PoijiException(e.getMessage(), e);
+        }
+    }
+
+    public static <K, V> Map<K, V> newMap(Field field) {
+        final Class<?> type = field.getType();
+        if (type == Map.class) {
+            return new LinkedHashMap<>();
+        }
+        return (Map<K, V>) newInstanceOf(type);
     }
 }

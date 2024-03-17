@@ -4,22 +4,16 @@ import com.poiji.bind.Unmarshaller;
 import com.poiji.exception.PoijiException;
 import com.poiji.option.PoijiOptions;
 import com.poiji.save.TransposeUtil;
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.Optional;
-import java.util.Spliterator;
-import java.util.Spliterators;
-import java.util.function.Consumer;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 import org.apache.poi.hssf.usermodel.HSSFFormulaEvaluator;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.formula.BaseFormulaEvaluator;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
+
+import java.io.IOException;
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * This is the main class that converts the excel sheet fromExcel Java object
@@ -42,6 +36,17 @@ abstract class HSSFUnmarshaller implements Unmarshaller {
         try (final HSSFWorkbook workbook = (HSSFWorkbook) workbook()) {
             final Sheet sheet = getSheet(type, workbook);
             processRowsToObjects(sheet, type, consumer);
+        } catch (final IOException e) {
+            throw new PoijiException("Problem occurred while closing HSSFWorkbook", e);
+        }
+    }
+
+    @Override
+    public List<String> readSheetNames() {
+        try (final HSSFWorkbook workbook = (HSSFWorkbook) workbook()) {
+            final List<String> result = new ArrayList<>();
+            workbook.forEach(sheet-> result.add(sheet.getSheetName()));
+            return result;
         } catch (final IOException e) {
             throw new PoijiException("Problem occurred while closing HSSFWorkbook", e);
         }

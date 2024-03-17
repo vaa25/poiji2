@@ -2,14 +2,17 @@ package com.poiji.bind.mapping;
 
 import com.poiji.exception.PoijiException;
 import com.poiji.option.PoijiOptions;
-import java.util.function.Consumer;
-import java.util.stream.Stream;
 import org.apache.poi.hssf.usermodel.HSSFFormulaEvaluator;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFFormulaEvaluator;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 /**
  * Created by hakan on 11.10.2020
@@ -27,6 +30,11 @@ public final class SheetUnmarshaller extends HSSFUnmarshaller {
     public <T> void unmarshal(Class<T> type, Consumer<? super T> consumer) {
         setBaseFormulaEvaluator();
         processRowsToObjects(sheet, type, consumer);
+    }
+
+    @Override
+    public List<String> readSheetNames() {
+        return Collections.singletonList(sheet.getSheetName());
     }
 
     private void setBaseFormulaEvaluator() {
