@@ -1,7 +1,8 @@
 = Poiji2
 
-This is an advanced fork of https://github.com/ozlerhakan/poiji. +
+This is an advanced copy of https://github.com/ozlerhakan/poiji. +
 Many thanks to ozlerhakan for inspiration.
+Many thanks to @breucode, @aerfus, @brunslo, @wilds, @Brutus5000, @ghacupha, @itsjwala, @beckerdennis, @kpolli, @thiyagu-7, @bendh, @jrse, @abdulrafique, @virtual-machinist, @4sujittiwari, @jmorgan-iad, @fatihyildizhan, @soberich, and @chinmay1994 for contribution.
 
 Apache POI library required as dependency to work with xlsx and xls. Tested with dependency 'org.apache.poi:poi-ooxml:5.2.5'.
 
